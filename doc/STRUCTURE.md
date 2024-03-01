@@ -1,20 +1,3 @@
-An educational chess game designed for single players to improve their strategic thinking. It features a powerful AI opponent who analyzes your moves, suggesting improvements based on potential captures, threats, and control over key squares.
-
-### Key Features:
-
-- **Single-player Mode**: Engage in a challenging match against a powerful AI opponent. 
-- **Move-by-Move Analysis**: Gain valuable insights with suggested improvements for every move you make. 
-- **AI Rationale Visualization**: Witness the AI's decision-making process in real-time, including:
-  - Top Potential Moves: See the top 5 squares the AI considers, highlighted with varying intensity based on their evaluation. 
-  - Evaluation Breakdown: Analyze each potential move with:
-    - The piece being considered for movement. 
-    - The target square. 
-    - A visual representation of the move's evaluation (e.g., bar graph, number). 
-    - Justification for the AI's evaluation (e.g., "Capture", "Threat", "Control"). 
-- **Game Logging**: Track your progress by saving and loading gameplay logs for later review. 
-- **Designed for Learning**: Develop your strategic thinking and chess skills through interactive analysis and guided improvement.
-
-### Structure
 ```
 chess_sage/
 ├── doc/              # Subdirectory for documentation files (e.g., README.md, user manual)
