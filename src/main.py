@@ -41,9 +41,6 @@ def main():
                     SEL_PIECE = game_board.get_piece_at((row, col))
                     SEL_PIECE_ROW = row
                     SEL_PIECE_COL = col
-                    # SEL_PIECE.current_square = SEL_PIECE_ROW, SEL_PIECE_COL
-                    # game_board.update_board((SEL_PIECE_ROW, SEL_PIECE_COL), SEL_PIECE)
-                    # cute_print(f"{SEL_PIECE.color}_{SEL_PIECE.type}: {SEL_PIECE.current_square}", f'{SEL_PIECE.color}_{SEL_PIECE.type}')
 
             elif event.type == pygame.MOUSEBUTTONUP:
                 mouse_is_down = False
@@ -56,7 +53,6 @@ def main():
                     if 0 <= new_row < 8 and 0 <= new_col < 8:
                         # (Optional) Implement logic to handle piece movement (currently not validated)
                         game_board.move_piece((SEL_PIECE_ROW, SEL_PIECE_COL), (new_row, new_col))
-                        cute_print(f"{SEL_PIECE.color}_{SEL_PIECE.type}: ({SEL_PIECE_ROW}, {SEL_PIECE_COL}) -> ({new_row}, {new_col})", f'{SEL_PIECE.color}_{SEL_PIECE.type}')
 
                     # Reset selected piece information
                     SEL_PIECE = None
