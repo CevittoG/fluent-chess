@@ -76,7 +76,7 @@ def draw_pieces(screen, board: Board, piece_images: dict, selected_piece_row: in
     :param piece_images:
     :return:
     """
-    piece_size = calculate_piece_size(SQUARE_PX_SIZE)
+    piece_size = calculate_piece_size(int(SQUARE_PX_SIZE))
 
     # Iterate over each square on the board
     for row in range(8):
