@@ -3,6 +3,12 @@ from typing import Tuple, Union
 from src.utils import cute_print
 
 
+class Square:
+    def __init__(self, row, col):
+        self.row = row
+        self.col = col
+
+
 class Board:
     def __init__(self):
         self.board: list[list] = [[None for _ in range(8)] for _ in range(8)]
@@ -36,6 +42,15 @@ class Board:
         else:
             return None
 
+    def get_all_pieces(self, filter_by: Union[None, Tuple] = None):
+        filter_func, filter_value = filter_by or (lambda _: True, None)  # Default to all pieces
+
+        for row in range(8):
+            for col in range(8):
+                piece = self.board[row][col]
+                if piece is not None and filter_func(piece, filter_value):
+                    yield piece
+
     def move_piece(self, start_position: Tuple[int, int], end_position: Tuple[int, int], piece_valid_moves: list):
         # Get the piece at the starting position
         piece = self.get_piece_at(start_position)
@@ -58,9 +73,7 @@ class Board:
                 self.board[end_position[0]][end_position[1]] = Queen(piece.color, end_position)  # ToDo: Choose a piece to promote to (queen, rook, bishop, knight)")
             else:
                 self.board[end_position[0]][end_position[1]] = piece
-
+            # Check King castling
+            if piece.type == 'king' and end_position[0] in (0, 7):
+                pass
             cute_print(f"{piece.color}_{piece.type}: {start_position} -> {end_position}", f'{piece.color}_{piece.type}')
-
-
-
-
