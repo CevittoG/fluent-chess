@@ -40,18 +40,24 @@ class Board:
         # Get the piece at the starting position
         piece = self.get_piece_at(start_position)
 
-        # Check if there's a piece and the destination is valid (currently a placeholder)
+        # Check if there's a piece at start_position
         if piece is None:
             cute_print(f'There is no piece in position {start_position}', 'error', 'red')
+        # Check if piece found can't move to end_position
         elif piece is not None and end_position not in piece_valid_moves:
             cute_print(f"{piece.color}_{piece.type} at {start_position} can't move to {end_position}", f'{piece.color}_{piece.type}', 'yellow')
+        # Check if piece found can move to end_position
         elif piece is not None and end_position in piece_valid_moves:
             # Update the piece state
             piece.movements.append(end_position)
             piece.current_square = end_position
             # Update the board state
             self.board[start_position[0]][start_position[1]] = None
-            self.board[end_position[0]][end_position[1]] = piece
+            # Check for Pawn promotion:
+            if piece.type == 'pawn' and end_position[0] in (0, 7):
+                self.board[end_position[0]][end_position[1]] = Queen(piece.color, end_position)  # ToDo: Choose a piece to promote to (queen, rook, bishop, knight)")
+            else:
+                self.board[end_position[0]][end_position[1]] = piece
 
             cute_print(f"{piece.color}_{piece.type}: {start_position} -> {end_position}", f'{piece.color}_{piece.type}')
 

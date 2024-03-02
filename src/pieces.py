@@ -4,8 +4,8 @@ from src.utils import cute_print
 
 class Piece:
     def __init__(self, color: str, type: str, current_square: Tuple[int, int]):
-        self.color = color
-        self.type = type
+        self.color: str = color
+        self.type: str = type
         self.current_square: Tuple[int, int] = current_square
         self.movements: list[Tuple[int, int]] = [current_square]
         self.captured: list[Union[Piece, None]] = [None]
@@ -190,7 +190,7 @@ class Pawn(Piece):
         else:
             move_direction = 1
 
-        # One square move
+        # One square move (could be a "Promotion")
         if 0 <= row + move_direction < 8 and board.get_piece_at((row + move_direction, col)) is None:
             valid_moves.append((row + move_direction, col))
         # Two squares move (only for first move)
