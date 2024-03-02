@@ -67,12 +67,14 @@ def main():
 
         # (Optional) Perform AI move calculation (if applicable)
 
-        # Update and render the game state (board, pieces, etc.)
+        # Render the game state (board, pieces, etc.)
         screen.fill((255, 255, 255))  # Set background color
+        # Prepare light and dark squares
         draw_board(screen, game_board)
-        draw_pieces(screen, game_board, PIECES_IMAGES, SEL_PIECE_ROW, SEL_PIECE_COL)
-        # Show posible moves
+        # Prepare posible moves
         highlight_valid_moves(screen, valid_moves)
+        # Prepare every piece in the board
+        draw_pieces(screen, game_board, PIECES_IMAGES, SEL_PIECE_ROW, SEL_PIECE_COL)
 
         # Update the display
         pygame.display.update()
