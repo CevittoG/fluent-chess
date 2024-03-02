@@ -13,9 +13,14 @@ BOARD_PX_SIZE = 800
 SQUARE_PX_SIZE = BOARD_PX_SIZE / 8
 PIECE_PX_SIZE = list(PIECES_IMAGES.values())[0].get_size()
 
-HIGHLIGHT_COLOR = (255, 200, 100)
-SUCCESS_COLOR = (255, 200, 100)
-ERROR_COLOR = (255, 200, 100)
+BOARD_LIGHT_COLOR = (255, 255, 255)
+BOARD_DARK_COLOR = (0, 0, 0)
+HIGHLIGHT_COLOR = (252, 232, 58)  # yellow
+SUCCESS_COLOR = (86, 240, 0)      # green
+ERROR_COLOR = (255, 56, 56)       # red
+# (255, 179, 2) orange
+# (45, 204, 255) light blue
+# (164, 171, 182) grey
 
 
 def calculate_piece_size(square_size):
@@ -59,7 +64,7 @@ def draw_board(screen, board: Board):
     for row in range(8):
         for col in range(8):
             # Determine square color based on row and column parity
-            square_color = light_square_color if (row + col) % 2 == 0 else dark_square_color
+            square_color = BOARD_LIGHT_COLOR if (row + col) % 2 == 0 else BOARD_DARK_COLOR
 
             # Create a rectangle representing the square
             square_rect = pygame.Rect(col * SQUARE_PX_SIZE, row * SQUARE_PX_SIZE, SQUARE_PX_SIZE, SQUARE_PX_SIZE)
@@ -122,3 +127,17 @@ def print_board(board: Board):
             else:
                 print(piece.color[0] + piece.type[0].upper(), end=" ")
         print()  # New line after each row
+
+
+def highlight_valid_moves(screen, valid_moves):
+    """
+    Highlights squares representing valid moves for the given piece.
+
+    Args:
+        screen:
+        valid_moves:
+    """
+    for row, col in valid_moves:
+        # Create a rectangle representing the square
+        square_rect = pygame.Rect(col * SQUARE_PX_SIZE, row * SQUARE_PX_SIZE, SQUARE_PX_SIZE, SQUARE_PX_SIZE)
+        pygame.draw.rect(screen, SUCCESS_COLOR, square_rect, width=3)
