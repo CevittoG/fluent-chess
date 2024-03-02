@@ -37,7 +37,39 @@ class King(Piece):
                 if (new_row, new_col) != (row, col) and 0 <= new_row < 8 and 0 <= new_col < 8 and (piece_at_destination is None or piece_at_destination.color != self.color):
                     valid_moves.append((new_row, new_col))
 
-        # ToDo: Castling
+        # Castling
+        if len(self.movements) == 1 and not self.in_check(board):
+            # Check for rook on both sides and their move status
+            left_rook = board.get_piece_at((row, 0))
+            right_rook = board.get_piece_at((row, 7))
+
+            # Check for queen-side castling (left rook)
+            if left_rook is not None and left_rook.color == self.color and len(left_rook.movements) == 1:
+                # Check squares between king and rook are empty
+                middle_piece = False
+                for middle_col in range(1, col):
+                    if board.get_piece_at((row, middle_col)) is not None:
+                        middle_piece = True
+                        break  # Stop if any piece is encountered
+                if not middle_piece:
+                    # Check if movement will put King on check
+                    if not King(self.color, (row, col - 2)).in_check(board):
+                        # Add queen-side castling move (king moves 2 left, rook jumps to position next to king)
+                        valid_moves.append((row, col - 2))
+
+            # Check for king-side castling (right rook)
+            if right_rook is not None and right_rook.color == self.color and len(right_rook.movements) == 1:
+                # Check squares between king and rook are empty
+                middle_piece = False
+                for middle_col in range(col + 1, 7):
+                    if board.get_piece_at((row, middle_col)) is not None:
+                        middle_piece = True
+                        break  # Stop if any piece is encountered
+                if not middle_piece:
+                    # Check if movement will put King on check
+                    if not King(self.color, (row, col + 2)).in_check(board):
+                        # Add king-side castling move (king moves 2 right, rook jumps to position next to king)
+                        valid_moves.append((row, col + 2))
 
         return valid_moves
 
