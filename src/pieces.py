@@ -40,8 +40,9 @@ class King(Piece):
         # iterate over posible positions
         for new_row in range(min_row, max_row + 1):
             for new_col in range(min_col, max_col + 1):
-                # Check if the end_position is empty or an enemy
-                if (new_row, new_col) != (row, col) and 0 <= new_row < 8 and 0 <= new_col < 8 and (board.get_piece_at((new_row, new_col)) is None or board.get_piece_at((new_row, new_col)).color != self.color):
+                # Check if the square is empty or occupied by an enemy piece
+                piece_at_destination = board.get_piece_at((new_row, new_col))
+                if (new_row, new_col) != (row, col) and 0 <= new_row < 8 and 0 <= new_col < 8 and (piece_at_destination is None or piece_at_destination.color != self.color):
                     valid_moves.append((new_row, new_col))
 
         # ToDo: Castling
