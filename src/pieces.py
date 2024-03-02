@@ -94,6 +94,31 @@ class Bishop(Piece):
         valid_moves = []
         row, col = self.current_square
 
+        # Define directions for movements
+        directions = [(1, 1), (1, -1), (-1, 1), (-1, -1)]
+
+        # Iterate through directions and check for valid moves
+        for move_row, move_col in directions:
+            new_row, new_col = row + move_row, col + move_col
+
+            # Check if the move is within board limits
+            while 0 <= new_row < 8 and 0 <= new_col < 8:
+                # Check if the square is empty or occupied by an enemy piece
+                piece_at_destination = board.get_piece_at((new_row, new_col))
+
+                # Stop validating that direction if friendly piece is found
+                if piece_at_destination is not None and piece_at_destination.color == self.color:
+                    break
+                # Valid move if empty or enemy piece
+                elif piece_at_destination is None:
+                    valid_moves.append((new_row, new_col))
+                # Stop iterating only if encountering an enemy piece
+                elif piece_at_destination is not None and piece_at_destination.color != self.color:
+                    valid_moves.append((new_row, new_col))
+                    break
+                # Continue iterating if empty square or friendly piece encountered
+                new_row, new_col = new_row + move_row, new_col + move_col
+
         return valid_moves
 
 
