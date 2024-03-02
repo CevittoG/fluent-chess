@@ -36,16 +36,16 @@ class Board:
         else:
             return None
 
-    def move_piece(self, start_position: Tuple[int, int], end_position: Tuple[int, int]):
+    def move_piece(self, start_position: Tuple[int, int], end_position: Tuple[int, int], piece_valid_moves: list):
         # Get the piece at the starting position
         piece = self.get_piece_at(start_position)
 
         # Check if there's a piece and the destination is valid (currently a placeholder)
         if piece is None:
             cute_print(f'There is no piece in position {start_position}', 'error', 'red')
-        elif piece is not None and end_position not in piece.get_valid_moves(self):
+        elif piece is not None and end_position not in piece_valid_moves:
             cute_print(f"{piece.color}_{piece.type} at {start_position} can't move to {end_position}", f'{piece.color}_{piece.type}', 'yellow')
-        elif piece is not None and end_position in piece.get_valid_moves(self):
+        elif piece is not None and end_position in piece_valid_moves:
             # Update the piece state
             piece.has_moved = True
             piece.current_square = end_position
