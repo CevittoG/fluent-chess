@@ -1,6 +1,6 @@
 import pygame
 from src import Piece, Board
-from src.visualization import draw_board, draw_pieces, PIECES_IMAGES, BOARD_PX_SIZE, SQUARE_PX_SIZE
+from src.visualization import draw_board, draw_pieces, PIECES_IMAGES, BOARD_PX_SIZE, SQUARE_PX_SIZE, highlight_valid_moves
 from src.utils import cute_print
 
 
