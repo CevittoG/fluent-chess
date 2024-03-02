@@ -15,9 +15,12 @@ PIECE_PX_SIZE = list(PIECES_IMAGES.values())[0].get_size()
 
 BOARD_LIGHT_COLOR = (255, 255, 255)
 BOARD_DARK_COLOR = (0, 0, 0)
-HIGHLIGHT_COLOR = (252, 232, 58)  # yellow
-SUCCESS_COLOR = (86, 240, 0)      # green
-ERROR_COLOR = (255, 56, 56)       # red
+HIGHLIGHT_COLOR = (255, 227, 128)  # soft yellow
+SUCCESS_COLOR = (121, 242, 192)    # soft green
+ERROR_COLOR = (255, 86, 48)        # soft red
+# (252, 232, 58) yellow
+# (86, 240, 0) green
+# (255, 56, 56) red
 # (255, 179, 2) orange
 # (45, 204, 255) light blue
 # (164, 171, 182) grey
@@ -56,10 +59,6 @@ def draw_board(screen, board: Board):
     :param board:
     :return:
     """
-    # Set colors for board squares
-    light_square_color = (230, 220, 210)
-    dark_square_color = (180, 170, 160)
-
     # Iterate over each square
     for row in range(8):
         for col in range(8):
@@ -90,10 +89,9 @@ def draw_pieces(screen, board: Board, piece_images: dict, selected_piece_row: in
 
             # Highlight the selected piece (if any)
             if row == selected_piece_row and col == selected_piece_col:
-
                 # Create a rectangle representing the square
                 square_rect = pygame.Rect(col * SQUARE_PX_SIZE, row * SQUARE_PX_SIZE, SQUARE_PX_SIZE, SQUARE_PX_SIZE)
-                pygame.draw.rect(screen, HIGHLIGHT_COLOR, square_rect, width=3)
+                pygame.draw.rect(screen, HIGHLIGHT_COLOR, square_rect, width=8)
 
             # If a piece is present, draw its image on the corresponding square
             if piece is not None:
@@ -140,4 +138,4 @@ def highlight_valid_moves(screen, valid_moves):
     for row, col in valid_moves:
         # Create a rectangle representing the square
         square_rect = pygame.Rect(col * SQUARE_PX_SIZE, row * SQUARE_PX_SIZE, SQUARE_PX_SIZE, SQUARE_PX_SIZE)
-        pygame.draw.rect(screen, SUCCESS_COLOR, square_rect, width=3)
+        pygame.draw.rect(screen, SUCCESS_COLOR, square_rect, width=8)
