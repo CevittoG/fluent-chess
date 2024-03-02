@@ -130,6 +130,21 @@ class Knight(Piece):
         valid_moves = []
         row, col = self.current_square
 
+        # Define possible knight moves (in L-shape patterns)
+        knight_moves = [(2, 1), (2, -1), (-2, 1), (-2, -1),
+                        (1, 2), (1, -2), (-1, 2), (-1, -2)]
+
+        # Iterate through potential moves and check validity
+        for move_row, move_col in knight_moves:
+            new_row, new_col = row + move_row, col + move_col
+
+            # Check if the move is within board limits
+            if 0 <= new_row < 8 and 0 <= new_col < 8:
+                # Check if the square is empty or occupied by an enemy piece
+                piece_at_destination = board.get_piece_at((new_row, new_col))
+                if piece_at_destination is None or piece_at_destination.color != self.color:
+                    valid_moves.append((new_row, new_col))
+
         return valid_moves
 
 
