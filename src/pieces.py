@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Tuple, Union
 from src.utils import cute_print
 
 
@@ -6,17 +6,9 @@ class Piece:
     def __init__(self, color: str, type: str, current_square: Tuple[int, int]):
         self.color = color
         self.type = type
-        self.current_square = current_square
-        self.has_moved = False
-
-    # def move(self, new_square: Tuple[int, int], board: Board):
-    #     # Validate move based on piece type and current board state
-    #     # (implement logic based on specific piece rules)
-    #     if self.is_valid_move(new_square, board):
-    #         # Update piece position and board state
-    #         self.current_square = new_square
-    #         board.update_board(self.current_square, self.type, None)  # Placeholder for capturing logic
-    #         # Handle special moves like castling or en passant if necessary
+        self.current_square: Tuple[int, int] = current_square
+        self.movements: list[Tuple[int, int]] = [current_square]
+        self.captured: list[Union[Piece, None]] = [None]
 
     def get_valid_moves(self, board) -> list:
         # Implement logic to check if the move is valid for the specific piece type. This will be overwritten by polymorphic behavior with subclasses (inherit)
@@ -201,7 +193,6 @@ class Pawn(Piece):
         # One square move
         if 0 <= row + move_direction < 8 and board.get_piece_at((row + move_direction, col)) is None:
             valid_moves.append((row + move_direction, col))
-
         # Two squares move (only for first move)
         if row == (6 if self.color == "white" else 1) and board.get_piece_at((row + move_direction, col)) is None and board.get_piece_at((row + 2 * move_direction, col)) is None:
             valid_moves.append((row + 2 * move_direction, col))
@@ -209,9 +200,16 @@ class Pawn(Piece):
         # Capture right diagonal moves (if enemy piece is present)
         if 0 <= row + move_direction < 8 and 0 <= col + 1 < 8 and board.get_piece_at((row + move_direction, col + 1)) is not None and board.get_piece_at((row + move_direction, col + 1)).color != self.color:
             valid_moves.append((row + move_direction, col + 1))
-
         # Capture left diagonal moves (if enemy piece is present)
         if 0 <= row + move_direction < 8 and 0 <= col - 1 < 8 and board.get_piece_at((row + move_direction, col - 1)) is not None and board.get_piece_at((row + move_direction, col - 1)).color != self.color:
             valid_moves.append((row + move_direction, col - 1))
+
+        # Additional logic for "en passant" (in passing)
+        passing_piece = board.get_piece_at((row, col + 1))
+        if passing_piece is not None and passing_piece.color != self.color and len(passing_piece.movements) == 2:
+            valid_moves.append((row + move_direction, col + 1))  # Capture en passant
+        passing_piece = board.get_piece_at((row, col - 1))
+        if passing_piece is not None and passing_piece.color != self.color and len(passing_piece.movements) == 2:
+            valid_moves.append((row + move_direction, col - 1))  # Capture en passant
 
         return valid_moves
