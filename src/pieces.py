@@ -23,6 +23,76 @@ class Piece:
         return []
 
 
+class King(Piece):
+    def __init__(self, color, current_square):
+        super().__init__(color, "king", current_square)
+
+    def get_valid_moves(self, board) -> list:
+        valid_moves = []
+        row, col = self.current_square
+
+        # Get rows and cols around piece... Ej: white king at initial position (0, 7)
+        min_row = max(0, row - 1)  # (0, 6) -> 6
+        max_row = min(7, row + 1)  # (7, 8) -> 7
+        min_col = max(0, col - 1)  # (0, 3) -> 3
+        max_col = min(7, col + 1)  # (7, 5) -> 5
+
+        # iterate over posible positions
+        for new_row in range(min_row, max_row + 1):
+            for new_col in range(min_col, max_col + 1):
+                # Check if the end_position is empty or an enemy
+                if (new_row, new_col) != (row, col) and (board.get_piece_at((new_row, new_col)) is None or board.get_piece_at((new_row, new_col)).color != self.color):
+                    valid_moves.append((new_row, new_col))
+
+        # ToDo: Castling
+
+        return valid_moves
+
+
+class Queen(Piece):
+    def __init__(self, color, current_square):
+        super().__init__(color, "queen", current_square)
+
+    def get_valid_moves(self, board) -> list:
+        valid_moves = []
+        row, col = self.current_square
+
+        return valid_moves
+
+
+class Bishop(Piece):
+    def __init__(self, color, current_square):
+        super().__init__(color, "bishop", current_square)
+
+    def get_valid_moves(self, board) -> list:
+        valid_moves = []
+        row, col = self.current_square
+
+        return valid_moves
+
+
+class Knight(Piece):
+    def __init__(self, color, current_square):
+        super().__init__(color, "knight", current_square)
+
+    def get_valid_moves(self, board) -> list:
+        valid_moves = []
+        row, col = self.current_square
+
+        return valid_moves
+
+
+class Rook(Piece):
+    def __init__(self, color, current_square):
+        super().__init__(color, "rook", current_square)
+
+    def get_valid_moves(self, board) -> list:
+        valid_moves = []
+        row, col = self.current_square
+
+        return valid_moves
+
+
 class Pawn(Piece):
     def __init__(self, color, current_square):
         super().__init__(color, "pawn", current_square)

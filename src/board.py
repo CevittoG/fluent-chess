@@ -1,4 +1,4 @@
-from src.pieces import Piece, Pawn
+from src.pieces import Piece, King, Queen, Bishop, Knight, Rook, Pawn
 from typing import Tuple, Union
 from src.utils import cute_print
 
@@ -14,10 +14,11 @@ class Board:
         for col in range(8):
             self.board[1][col] = Pawn("black", (1, col))
             self.board[6][col] = Pawn("white", (6, col))
-            # Place other pieces
-            piece_type = ((Piece, "rook"), (Piece, "knight"), (Piece, "bishop"), (Piece, "queen"), (Piece, "king"))[col % 5]
-            self.board[0][col] = piece_type[0]("black", piece_type[1], (0, col))
-            self.board[7][col] = piece_type[0]("white", piece_type[1], (7, col))
+        # Place other pieces
+        positions = [(i, j) for i in range(8) for j in range(8)]
+        for color, row in zip(("black", "white"), (0, 7)):
+            for j, piece_type in enumerate([Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook]):
+                self.board[row][j] = piece_type(color, positions[row * 8 + j])
 
     def get_piece_at(self, position: Tuple[int, int]) -> Union[Piece, None]:
         """
