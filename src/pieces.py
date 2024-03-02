@@ -73,6 +73,16 @@ class King(Piece):
 
         return valid_moves
 
+    def in_check(self, board) -> bool:
+        # Check for enemy pieces attacking the king's position
+        king_row, king_col = self.current_square
+        for row in range(8):
+            for col in range(8):
+                piece = board.get_piece_at((row, col))
+                if piece is not None and piece.color != self.color and (king_row, king_col) in piece.get_valid_moves(board):
+                    return True  # Enemy piece can capture the king
+        return False
+
 
 class Queen(Piece):
     def __init__(self, color, current_square):
