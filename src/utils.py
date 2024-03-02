@@ -154,3 +154,14 @@ def progress_bar(current_iter: int, max_iter: int, start_time: Union[int, float]
 
     if current_iter == max_iter:
         print("")
+
+
+# --------------------------------------------------------------------------------------------------- TERMINAL CUSTOMIZATION
+def adjacent_positions(pos1: tuple, pos2: tuple) -> bool:
+    row1, col1 = pos1
+    row2, col2 = pos2
+
+    row_distance = abs(row1 - row2)
+    col_distance = abs(col1 - col2)
+
+    return row_distance in (-1, 0, 1) and col_distance in (-1, 0, 1)

@@ -1,5 +1,5 @@
 from typing import Tuple, Union
-from src.utils import cute_print
+from src.utils import cute_print, adjacent_positions
 
 
 class Piece:
@@ -32,13 +32,17 @@ class King(Piece):
         # iterate over posible positions
         for new_row in range(min_row, max_row + 1):
             for new_col in range(min_col, max_col + 1):
-                # Check if the square is empty or occupied by an enemy piece
-                piece_at_destination = board.get_piece_at((new_row, new_col))
-                if (new_row, new_col) != (row, col) and 0 <= new_row < 8 and 0 <= new_col < 8 and (piece_at_destination is None or piece_at_destination.color != self.color):
-                    valid_moves.append((new_row, new_col))
+                # Check if the square within board limits
+                if (new_row, new_col) != (row, col) and 0 <= new_row < 8 and 0 <= new_col < 8:
+                    # Check if future position would put King on check
+                    if not self.in_check(board, (new_row, new_col)):
+                        # Check if the square is empty or occupied by an enemy piece
+                        piece_at_destination = board.get_piece_at((new_row, new_col))
+                        if piece_at_destination is None or piece_at_destination.color != self.color:
+                            valid_moves.append((new_row, new_col))
 
         # Castling
-        if len(self.movements) == 1 and not self.in_check(board):
+        if len(self.movements) == 1 and not self.in_check(board, self.current_square):
             # Check for rook on both sides and their move status
             left_rook = board.get_piece_at((row, 0))
             right_rook = board.get_piece_at((row, 7))
@@ -53,7 +57,7 @@ class King(Piece):
                         break  # Stop if any piece is encountered
                 if not middle_piece:
                     # Check if movement will put King on check
-                    if not King(self.color, (row, col - 2)).in_check(board):
+                    if not self.in_check(board, (row, col - 2)):
                         # Add queen-side castling move (king moves 2 left, rook jumps to position next to king)
                         valid_moves.append((row, col - 2))
 
@@ -67,20 +71,21 @@ class King(Piece):
                         break  # Stop if any piece is encountered
                 if not middle_piece:
                     # Check if movement will put King on check
-                    if not King(self.color, (row, col + 2)).in_check(board):
+                    if not self.in_check(board, (row, col + 2)):
                         # Add king-side castling move (king moves 2 right, rook jumps to position next to king)
                         valid_moves.append((row, col + 2))
 
         return valid_moves
 
-    def in_check(self, board) -> bool:
+    def in_check(self, board, king_position) -> bool:
         # Check for enemy pieces attacking the king's position
-        king_row, king_col = self.current_square
-        for row in range(8):
-            for col in range(8):
-                piece = board.get_piece_at((row, col))
-                if piece is not None and piece.color != self.color and (king_row, king_col) in piece.get_valid_moves(board):
-                    return True  # Enemy piece can capture the king
+        for enemy_piece in board.get_all_pieces(filter_by=(lambda piece, filter_color: piece.color != filter_color, self.color)):
+            cute_print(f"Checking {enemy_piece.color}_{enemy_piece.type}", f"{enemy_piece.color}_{enemy_piece.type}")
+            # Check for an enemy piece at any given square of the board that could capture king_position
+            if not isinstance(enemy_piece, King) and king_position in enemy_piece.get_valid_moves(board):
+                return True  # Enemy piece can capture the king
+            elif isinstance(enemy_piece, King) and adjacent_positions(king_position, enemy_piece.current_square):
+                return True  # Thread is King... This is checked separately because of recursion problem between get_valid_moves() and in_check() methods
         return False
 
 
