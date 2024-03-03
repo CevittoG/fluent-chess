@@ -77,3 +77,17 @@ class Board:
             if piece.type == 'king' and end_position[0] in (0, 7):
                 pass
             cute_print(f"{piece.color}_{piece.type}: {start_position} -> {end_position}", f'{piece.color}_{piece.type}')
+
+    def copy(self):
+        """Creates a copy of the board.
+
+        Returns:
+            Board: A new Board object representing a copy of the current board.
+        """
+
+        new_board = Board()  # Create a new Board object
+        for row in range(8):
+            for col in range(8):
+                piece = self.board[row][col]
+                new_board.board[row][col] = piece if piece is not None else None
+        return new_board
