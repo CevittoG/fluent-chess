@@ -19,7 +19,7 @@ class King(Piece):
     def __init__(self, color, current_square):
         super().__init__(color, "king", current_square)
 
-    def get_valid_moves(self, board) -> list:
+    def get_valid_moves(self, board) -> list[tuple[tuple, str]]:
         valid_moves = []
         row, col = self.current_square
 
@@ -99,7 +99,7 @@ class Queen(Piece):
     def __init__(self, color, current_square):
         super().__init__(color, "queen", current_square)
 
-    def get_valid_moves(self, board) -> list:
+    def get_valid_moves(self, board) -> list[tuple[tuple, str]]:
         valid_moves = []
         row, col = self.current_square
 
@@ -135,7 +135,7 @@ class Bishop(Piece):
     def __init__(self, color, current_square):
         super().__init__(color, "bishop", current_square)
 
-    def get_valid_moves(self, board) -> list:
+    def get_valid_moves(self, board) -> list[tuple[tuple, str]]:
         valid_moves = []
         row, col = self.current_square
 
@@ -171,16 +171,16 @@ class Knight(Piece):
     def __init__(self, color, current_square):
         super().__init__(color, "knight", current_square)
 
-    def get_valid_moves(self, board) -> list:
+    def get_valid_moves(self, board) -> list[tuple[tuple, str]]:
         valid_moves = []
         row, col = self.current_square
 
         # Define possible knight moves (in L-shape patterns)
-        knight_moves = [(2, 1), (2, -1), (-2, 1), (-2, -1),
-                        (1, 2), (1, -2), (-1, 2), (-1, -2)]
+        directions = [(2, 1), (2, -1), (-2, 1), (-2, -1),
+                      (1, 2), (1, -2), (-1, 2), (-1, -2)]
 
         # Iterate through potential moves and check validity
-        for move_row, move_col in knight_moves:
+        for move_row, move_col in directions:
             new_row, new_col = row + move_row, col + move_col
 
             # Check if the move is within board limits
@@ -199,7 +199,7 @@ class Rook(Piece):
     def __init__(self, color, current_square):
         super().__init__(color, "rook", current_square)
 
-    def get_valid_moves(self, board) -> list:
+    def get_valid_moves(self, board) -> list[tuple[tuple, str]]:
         valid_moves = []
         row, col = self.current_square
 
@@ -235,7 +235,7 @@ class Pawn(Piece):
     def __init__(self, color, current_square):
         super().__init__(color, "pawn", current_square)
 
-    def get_valid_moves(self, board) -> list:
+    def get_valid_moves(self, board) -> list[tuple[tuple, str]]:
         valid_moves = []
         row, col = self.current_square
 
@@ -247,24 +247,24 @@ class Pawn(Piece):
 
         # One square move (could be a "Promotion")
         if 0 <= row + move_direction < 8 and board.get_piece_at((row + move_direction, col)) is None:
-            moves.append(((row + move_direction, col), 'empty'))
+            valid_moves.append(((row + move_direction, col), 'empty'))
         # Two squares move (only for first move)
         if row == (6 if self.color == "white" else 1) and board.get_piece_at((row + move_direction, col)) is None and board.get_piece_at((row + 2 * move_direction, col)) is None:
-            moves.append(((row + 2 * move_direction, col), 'empty'))
+            valid_moves.append(((row + 2 * move_direction, col), 'empty'))
 
         # Additional logic for "en passant" (in passing)
         passing_piece = board.get_piece_at((row, col + 1))
         if passing_piece is not None and passing_piece.color != self.color and len(passing_piece.movements) == 2:
-            moves.append(((row + move_direction, col + 1), 'opponent'))  # Capture en passant
+            valid_moves.append(((row + move_direction, col + 1), 'opponent'))  # Capture en passant
         passing_piece = board.get_piece_at((row, col - 1))
         if passing_piece is not None and passing_piece.color != self.color and len(passing_piece.movements) == 2:
-            moves.append(((row + move_direction, col - 1), 'opponent'))  # Capture en passant
+            valid_moves.append(((row + move_direction, col - 1), 'opponent'))  # Capture en passant
 
         # Capture right diagonal moves (if enemy piece is present)
         if 0 <= row + move_direction < 8 and 0 <= col + 1 < 8 and board.get_piece_at((row + move_direction, col + 1)) is not None and board.get_piece_at((row + move_direction, col + 1)).color != self.color:
-            moves.append(((row + move_direction, col + 1), 'opponent'))
+            valid_moves.append(((row + move_direction, col + 1), 'opponent'))
         # Capture left diagonal moves (if enemy piece is present)
         if 0 <= row + move_direction < 8 and 0 <= col - 1 < 8 and board.get_piece_at((row + move_direction, col - 1)) is not None and board.get_piece_at((row + move_direction, col - 1)).color != self.color:
-            moves.append(((row + move_direction, col - 1), 'opponent'))
+            valid_moves.append(((row + move_direction, col - 1), 'opponent'))
 
-        return moves
+        return valid_moves
