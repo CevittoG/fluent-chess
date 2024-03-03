@@ -80,13 +80,17 @@ class King(Piece):
         return valid_moves
 
     def in_check(self, board, king_position) -> bool:
-        # Check for enemy pieces attacking the king's position
-        for enemy_piece in board.get_all_pieces(filter_by=(lambda piece, filter_color: piece.color != filter_color, self.color)):
-            cute_print(f"Checking {enemy_piece.color}_{enemy_piece.type}", f"{enemy_piece.color}_{enemy_piece.type}")
+        # Check for opponent pieces attacking the king's position
+        for opponent_piece in board.get_all_pieces(filter_by=(lambda piece, filter_color: piece is not None and piece.color != filter_color, self.color)):
+            # Create auxiliar board to check king_position is in attack. aux_board is needed in the case king_position != self.current_position
+            aux_board = board.copy()
+            aux_board.board[king_position[0]][king_position[1]] = King(self.color, king_position)
+            attack_squares = [position for position, label in opponent_piece.get_valid_moves(aux_board) if label == 'opponent'] if not isinstance(opponent_piece, King) else []
+
             # Check for an enemy piece at any given square of the board that could capture king_position
-            if not isinstance(enemy_piece, King) and king_position in enemy_piece.get_valid_moves(board):
+            if not isinstance(opponent_piece, King) and king_position in attack_squares:
                 return True  # Enemy piece can capture the king
-            elif isinstance(enemy_piece, King) and adjacent_positions(king_position, enemy_piece.current_square):
+            elif isinstance(opponent_piece, King) and adjacent_positions(king_position, opponent_piece.current_square):
                 return True  # Thread is King... This is checked separately because of recursion problem between get_valid_moves() and in_check() methods
         return False
 
