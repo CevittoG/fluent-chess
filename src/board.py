@@ -63,14 +63,29 @@ class Board:
                 cute_print(f"{piece.color}_{piece.type} at {start_position} can't move to {end_position}", f'{piece.color}_{piece.type}', 'yellow')
             # Check if piece found can move to end_position
             elif end_position == validated_end_position:
-                self.perform_standard_move(piece, start_position, end_position)
+                if 'opponent' in move_label:
+                    self.capture_piece(piece, end_position)
 
                 if isinstance(piece, Pawn) and end_position[0] in (0, 7):   # Pawn promotion
                     self.perform_promotion(piece, end_position)
                 elif isinstance(piece, Pawn) and 'passant' in move_label:   # Pawn passing
-                    self.perform_en_passant(piece, end_position)
+                    self.perform_en_passant(piece, start_position, move_label)
                 elif isinstance(piece, King) and 'castling' in move_label:  # King castling
                     self.perform_castling(end_position, move_label)
+
+                self.perform_standard_move(piece, start_position, end_position)
+
+    def capture_piece(self, attacker_piece: Piece, position_taken: tuple[int, int]):
+        piece_taken = self.get_piece_at(position_taken)
+        if piece_taken is not None:
+            # Update the piece state
+            attacker_piece.capture(piece_taken)
+            # Update the board state
+            self.board[position_taken[0]][position_taken[1]] = None
+            cute_print(f"{piece_taken.color}_{piece_taken.type} captured by {attacker_piece.color}_{attacker_piece.type} at {position_taken}", 'swords')
+        else:
+            cute_print(f"There is no Piece to capture at {position_taken}", 'error', 'red')
+            sys.exit()
 
     def perform_standard_move(self, piece, start_position: tuple[int, int], end_position: tuple[int, int]):
         # Update the piece state
@@ -101,8 +116,15 @@ class Board:
             cute_print("Couldn't find Rook for castling special move", 'error', 'red')
             sys.exit()
 
-    def perform_en_passant(self, piece: Pawn, end_position: tuple[int, int]):
-        pass
+    def perform_en_passant(self, attacker_pawn: Piece, attacker_position: tuple[int, int], move_label: str):
+        if 'left' not in move_label and 'right' not in move_label:
+            cute_print(f"'{move_label}' label is not valid. Must be 'opponent-left_passant' or 'opponent-right_passant'", 'error', 'red')
+            sys.exit()
+
+        pawn_col = attacker_position[1] - 1 if 'left' in move_label else attacker_position[1] + 1 if 'right' in move_label else None
+
+        captured_pawn_position = attacker_position[0], pawn_col
+        self.capture_piece(attacker_pawn, captured_pawn_position)
 
     def copy(self):
         """Creates a copy of the board.

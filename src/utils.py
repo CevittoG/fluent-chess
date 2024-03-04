@@ -61,6 +61,7 @@ class Emoji:
         'clock': '\U0001F551',          # 🕐 Clock
         'broom': '\U0001F9F9',          # 🧹 Broom
         'mouse': '\U0001f5b1\ufe0f',    # 🖱️ Computer Mouse
+        'swords': '\u2694\uFE0F',       # ⚔️ Crossed Swords
         'black_pawn': '\u265F',
         'black_rook': '\u265C',
         'black_knight': '\u265E',
