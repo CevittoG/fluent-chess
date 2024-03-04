@@ -14,6 +14,10 @@ class Piece:
         # Implement logic to check if the move is valid for the specific piece type. This will be overwritten by polymorphic behavior with subclasses (inherit)
         return []
 
+    def move(self, new_position):
+        self.movements.append(new_position)
+        self.current_square = new_position
+
 
 class King(Piece):
     def __init__(self, color, current_square):
@@ -39,9 +43,9 @@ class King(Piece):
                         # Check if the square is empty or occupied by an enemy piece
                         piece_at_destination = board.get_piece_at((new_row, new_col))
                         if piece_at_destination is None:
-                            valid_moves.append(((new_row, new_col), 'empty'))
+                            valid_moves.append(((new_row, new_col), 'empty-standard'))
                         elif piece_at_destination is not None and piece_at_destination.color != self.color:
-                            valid_moves.append(((new_row, new_col), 'opponent'))
+                            valid_moves.append(((new_row, new_col), 'opponent-standard'))
 
         # Castling
         if len(self.movements) == 1 and not self.in_check(board, self.current_square):
@@ -61,7 +65,7 @@ class King(Piece):
                     # Check if movement will put King on check
                     if not self.in_check(board, (row, col - 2)):
                         # Add queen-side castling move (king moves 2 left, rook jumps to position next to king)
-                        valid_moves.append(((row, col - 2), 'empty'))
+                        valid_moves.append(((row, col - 2), 'empty-queenside_castling'))
 
             # Check for king-side castling (right rook)
             if right_rook is not None and right_rook.color == self.color and len(right_rook.movements) == 1:
@@ -75,7 +79,7 @@ class King(Piece):
                     # Check if movement will put King on check
                     if not self.in_check(board, (row, col + 2)):
                         # Add king-side castling move (king moves 2 right, rook jumps to position next to king)
-                        valid_moves.append(((row, col + 2), 'empty'))
+                        valid_moves.append(((row, col + 2), 'empty-kingside_castling'))
 
         return valid_moves
 
@@ -85,7 +89,7 @@ class King(Piece):
             # Create auxiliar board to check king_position is in attack. aux_board is needed in the case king_position != self.current_position
             aux_board = board.copy()
             aux_board.board[king_position[0]][king_position[1]] = King(self.color, king_position)
-            attack_squares = [position for position, label in opponent_piece.get_valid_moves(aux_board) if label == 'opponent'] if not isinstance(opponent_piece, King) else []
+            attack_squares = [position for position, label in opponent_piece.get_valid_moves(aux_board) if 'opponent' in label] if not isinstance(opponent_piece, King) else []
 
             # Check for an enemy piece at any given square of the board that could capture king_position
             if not isinstance(opponent_piece, King) and king_position in attack_squares:
@@ -120,10 +124,10 @@ class Queen(Piece):
                     break
                 # Valid move if empty or enemy piece
                 elif piece_at_destination is None:
-                    valid_moves.append(((new_row, new_col), 'empty'))
+                    valid_moves.append(((new_row, new_col), 'empty-standard'))
                 # Stop iterating only if encountering an enemy piece
                 elif piece_at_destination is not None and piece_at_destination.color != self.color:
-                    valid_moves.append(((new_row, new_col), 'opponent'))
+                    valid_moves.append(((new_row, new_col), 'opponent-standard'))
                     break
                 # Continue iterating if empty square or friendly piece encountered
                 new_row, new_col = new_row + move_row, new_col + move_col
@@ -156,10 +160,10 @@ class Bishop(Piece):
                     break
                 # Valid move if empty or enemy piece
                 elif piece_at_destination is None:
-                    valid_moves.append(((new_row, new_col), 'empty'))
+                    valid_moves.append(((new_row, new_col), 'empty-standard'))
                 # Stop iterating only if encountering an enemy piece
                 elif piece_at_destination is not None and piece_at_destination.color != self.color:
-                    valid_moves.append(((new_row, new_col), 'opponent'))
+                    valid_moves.append(((new_row, new_col), 'opponent-standard'))
                     break
                 # Continue iterating if empty square or friendly piece encountered
                 new_row, new_col = new_row + move_row, new_col + move_col
@@ -188,9 +192,9 @@ class Knight(Piece):
                 # Check if the square is empty or occupied by an enemy piece
                 piece_at_destination = board.get_piece_at((new_row, new_col))
                 if piece_at_destination is None:
-                    valid_moves.append(((new_row, new_col), 'empty'))
+                    valid_moves.append(((new_row, new_col), 'empty-standard'))
                 elif piece_at_destination is not None and piece_at_destination.color != self.color:
-                    valid_moves.append(((new_row, new_col), 'opponent'))
+                    valid_moves.append(((new_row, new_col), 'opponent-standard'))
 
         return valid_moves
 
@@ -220,10 +224,10 @@ class Rook(Piece):
                     break
                 # Valid move if empty or enemy piece
                 elif piece_at_destination is None:
-                    valid_moves.append(((new_row, new_col), 'empty'))
+                    valid_moves.append(((new_row, new_col), 'empty-standard'))
                 # Stop iterating only if encountering an enemy piece
                 elif piece_at_destination is not None and piece_at_destination.color != self.color:
-                    valid_moves.append(((new_row, new_col), 'opponent'))
+                    valid_moves.append(((new_row, new_col), 'opponent-standard'))
                     break
                 # Continue iterating if empty square or friendly piece encountered
                 new_row, new_col = new_row + move_row, new_col + move_col
@@ -247,24 +251,24 @@ class Pawn(Piece):
 
         # One square move (could be a "Promotion")
         if 0 <= row + move_direction < 8 and board.get_piece_at((row + move_direction, col)) is None:
-            valid_moves.append(((row + move_direction, col), 'empty'))
+            valid_moves.append(((row + move_direction, col), 'empty-standard'))
         # Two squares move (only for first move)
         if row == (6 if self.color == "white" else 1) and board.get_piece_at((row + move_direction, col)) is None and board.get_piece_at((row + 2 * move_direction, col)) is None:
-            valid_moves.append(((row + 2 * move_direction, col), 'empty'))
+            valid_moves.append(((row + 2 * move_direction, col), 'empty-standard'))
 
         # Additional logic for "en passant" (in passing)
         passing_piece = board.get_piece_at((row, col + 1))
         if passing_piece is not None and passing_piece.color != self.color and len(passing_piece.movements) == 2:
-            valid_moves.append(((row + move_direction, col + 1), 'opponent'))  # Capture en passant
+            valid_moves.append(((row + move_direction, col + 1), 'opponent-right_passant'))
         passing_piece = board.get_piece_at((row, col - 1))
         if passing_piece is not None and passing_piece.color != self.color and len(passing_piece.movements) == 2:
-            valid_moves.append(((row + move_direction, col - 1), 'opponent'))  # Capture en passant
+            valid_moves.append(((row + move_direction, col - 1), 'opponent-left_passant'))
 
         # Capture right diagonal moves (if enemy piece is present)
         if 0 <= row + move_direction < 8 and 0 <= col + 1 < 8 and board.get_piece_at((row + move_direction, col + 1)) is not None and board.get_piece_at((row + move_direction, col + 1)).color != self.color:
-            valid_moves.append(((row + move_direction, col + 1), 'opponent'))
+            valid_moves.append(((row + move_direction, col + 1), 'opponent-standard'))
         # Capture left diagonal moves (if enemy piece is present)
         if 0 <= row + move_direction < 8 and 0 <= col - 1 < 8 and board.get_piece_at((row + move_direction, col - 1)) is not None and board.get_piece_at((row + move_direction, col - 1)).color != self.color:
-            valid_moves.append(((row + move_direction, col - 1), 'opponent'))
+            valid_moves.append(((row + move_direction, col - 1), 'opponent-standard'))
 
         return valid_moves
