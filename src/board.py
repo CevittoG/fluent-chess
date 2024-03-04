@@ -56,25 +56,6 @@ class Board:
         # Check if there's a piece at start_position
         if piece is None:
             cute_print(f'There is no piece in position {start_position}', 'error', 'red')
-        # Check if piece found can't move to end_position
-        elif piece is not None and end_position not in piece_valid_moves:
-            cute_print(f"{piece.color}_{piece.type} at {start_position} can't move to {end_position}", f'{piece.color}_{piece.type}', 'yellow')
-        # Check if piece found can move to end_position
-        elif piece is not None and end_position in piece_valid_moves:
-            # Update the piece state
-            piece.movements.append(end_position)
-            piece.current_square = end_position
-            # Update the board state
-            self.board[start_position[0]][start_position[1]] = None
-            # Check for Pawn promotion:
-            if piece.type == 'pawn' and end_position[0] in (0, 7):
-                self.board[end_position[0]][end_position[1]] = Queen(piece.color, end_position)  # ToDo: Choose a piece to promote to (queen, rook, bishop, knight)")
-            else:
-                self.board[end_position[0]][end_position[1]] = piece
-            # Check King castling
-            if piece.type == 'king' and end_position[0] in (0, 7):
-                pass
-            cute_print(f"{piece.color}_{piece.type}: {start_position} -> {end_position}", f'{piece.color}_{piece.type}')
         else:
             validated_end_position, move_label = find_position(piece_valid_moves, end_position)
             # Check if piece found can't move to end_position
@@ -103,6 +84,19 @@ class Board:
         self.board[end_position[0]][end_position[1]] = Queen(piece.color, end_position)  # ToDo: Choose a piece to promote to (queen, rook, bishop, knight)")
 
     def perform_castling(self, start_position: tuple[int, int], end_position: tuple[int, int], move_label: str):
+
+        rook_col = 0 if 'queenside' in move_label else 7 if 'kingside' in move_label else None
+
+        rook_position = end_position[0], rook_col
+        rook = self.get_piece_at(rook_position)
+
+        if rook is not None and isinstance(rook, Rook):
+            rook_new_position = rook_position[0], 3 if 'queenside' in move_label else 5 if 'kingside' in move_label else None
+            self.perform_standard_move(rook, rook_position, rook_new_position)
+        else:
+            cute_print("Couldn't find Rook for castling special move", 'error', 'red')
+            sys.exit()
+
     def perform_en_passant(self, piece: Pawn, end_position: tuple[int, int]):
         pass
 
