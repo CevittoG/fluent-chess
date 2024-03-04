@@ -156,7 +156,7 @@ def progress_bar(current_iter: int, max_iter: int, start_time: Union[int, float]
         print("")
 
 
-# --------------------------------------------------------------------------------------------------- TERMINAL CUSTOMIZATION
+# --------------------------------------------------------------------------------------------------- POSITIONS (TUPLES)
 def adjacent_positions(pos1: tuple, pos2: tuple) -> bool:
     row1, col1 = pos1
     row2, col2 = pos2
@@ -165,3 +165,14 @@ def adjacent_positions(pos1: tuple, pos2: tuple) -> bool:
     col_distance = abs(col1 - col2)
 
     return row_distance in (-1, 0, 1) and col_distance in (-1, 0, 1)
+
+
+def find_position(moves: list[tuple[tuple[int, int], str]], position: tuple[int, int]) -> Union[tuple[bool, bool], tuple[tuple, str]]:
+    result = False, False
+    for move, label in moves:
+        if move == position:
+            result = (move, label)
+            break  # Stop searching once found
+
+    return result
+

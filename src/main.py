@@ -58,7 +58,7 @@ def main():
                     # Handle piece movement
                     if 0 <= new_row < 8 and 0 <= new_col < 8:
                         # Move piece on board and update states
-                        game_board.move_piece((SEL_PIECE_ROW, SEL_PIECE_COL), (new_row, new_col), [position for position, _ in valid_moves])
+                        game_board.move_piece(SEL_PIECE, (SEL_PIECE_ROW, SEL_PIECE_COL), (new_row, new_col), valid_moves)
 
                     # Reset selected piece information
                     SEL_PIECE = None
@@ -73,8 +73,8 @@ def main():
         # Prepare light and dark squares
         draw_board(screen, game_board)
         # Prepare posible moves
-        highlight_square(screen, [position for position, label in valid_moves if label == 'empty'], SUCCESS_COLOR)
-        highlight_square(screen, [position for position, label in valid_moves if label == 'opponent'], ERROR_COLOR)
+        highlight_square(screen, [position for position, label in valid_moves if 'empty' in label], SUCCESS_COLOR)
+        highlight_square(screen, [position for position, label in valid_moves if 'opponent' in label], ERROR_COLOR)
         # Prepare every piece in the board
         draw_pieces(screen, game_board, PIECES_IMAGES, SEL_PIECE_ROW, SEL_PIECE_COL)
 
