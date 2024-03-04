@@ -4,12 +4,6 @@ from src.utils import cute_print, find_position
 import sys
 
 
-class Square:
-    def __init__(self, row, col):
-        self.row = row
-        self.col = col
-
-
 class Board:
     def __init__(self):
         self.board: list[list] = [[None for _ in range(8)] for _ in range(8)]
@@ -67,13 +61,16 @@ class Board:
                     self.capture_piece(piece, end_position)
 
                 if isinstance(piece, Pawn) and end_position[0] in (0, 7):   # Pawn promotion
+                    self.perform_standard_move(piece, start_position, end_position)
                     self.perform_promotion(piece, end_position)
                 elif isinstance(piece, Pawn) and 'passant' in move_label:   # Pawn passing
+                    self.perform_standard_move(piece, start_position, end_position)
                     self.perform_en_passant(piece, start_position, move_label)
                 elif isinstance(piece, King) and 'castling' in move_label:  # King castling
                     self.perform_castling(end_position, move_label)
-
-                self.perform_standard_move(piece, start_position, end_position)
+                    self.perform_standard_move(piece, start_position, end_position)
+                else:
+                    self.perform_standard_move(piece, start_position, end_position)
 
     def capture_piece(self, attacker_piece: Piece, position_taken: tuple[int, int]):
         piece_taken = self.get_piece_at(position_taken)
@@ -97,6 +94,9 @@ class Board:
 
     def perform_promotion(self, piece: Pawn, end_position: tuple[int, int]):
         self.board[end_position[0]][end_position[1]] = Queen(piece.color, end_position)  # ToDo: Choose a piece to promote to (queen, rook, bishop, knight)")
+        promoted_piece = self.get_piece_at(end_position)
+        promoted_piece.captured = piece.captured
+        promoted_piece.movements = piece.movements
         cute_print(f"Pawn at {end_position} has been promoted", 'star')
 
     def perform_castling(self, end_position: tuple[int, int], move_label: str):

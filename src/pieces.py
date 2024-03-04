@@ -8,7 +8,7 @@ class Piece:
         self.type: str = type
         self.current_square: Tuple[int, int] = current_square
         self.movements: list[Tuple[int, int]] = [current_square]
-        self.captured: list[Union[Piece, None]] = [None]
+        self.captured: list[Union[Piece, None]] = []
 
     def get_valid_moves(self, board) -> list[tuple[tuple, str]]:
         # Implement logic to check if the move is valid for the specific piece type. This will be overwritten by polymorphic behavior with subclasses (inherit)
