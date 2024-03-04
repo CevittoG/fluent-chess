@@ -97,6 +97,7 @@ class Board:
 
     def perform_promotion(self, piece: Pawn, end_position: tuple[int, int]):
         self.board[end_position[0]][end_position[1]] = Queen(piece.color, end_position)  # ToDo: Choose a piece to promote to (queen, rook, bishop, knight)")
+        cute_print(f"Pawn at {end_position} has been promoted", 'star')
 
     def perform_castling(self, end_position: tuple[int, int], move_label: str):
 

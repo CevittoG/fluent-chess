@@ -49,6 +49,7 @@ class Emoji:
         'success': '\u2714',            # ✅ Green check mark
         'warning': '\u26a0\ufe0f',      # ⚠️ Warning sign
         'error': '\u274c\ufe0f',        # ❌ Red cross mark
+        'star': '\u2B50',               # ⭐ Star
         'info': '\u2139\ufe0f',         # ℹ️ Information
         'arrow_right': '\u2192\ufe0f',  # ➡️ Right arrow
         'download': '\U0001F4E5',       # 📥️ Download Emoji
