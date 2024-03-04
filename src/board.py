@@ -70,7 +70,7 @@ class Board:
                 elif isinstance(piece, Pawn) and 'passant' in move_label:   # Pawn passing
                     self.perform_en_passant(piece, end_position)
                 elif isinstance(piece, King) and 'castling' in move_label:  # King castling
-                    self.perform_castling(start_position, end_position, move_label)
+                    self.perform_castling(end_position, move_label)
 
     def perform_standard_move(self, piece, start_position: tuple[int, int], end_position: tuple[int, int]):
         # Update the piece state
@@ -83,7 +83,7 @@ class Board:
     def perform_promotion(self, piece: Pawn, end_position: tuple[int, int]):
         self.board[end_position[0]][end_position[1]] = Queen(piece.color, end_position)  # ToDo: Choose a piece to promote to (queen, rook, bishop, knight)")
 
-    def perform_castling(self, start_position: tuple[int, int], end_position: tuple[int, int], move_label: str):
+    def perform_castling(self, end_position: tuple[int, int], move_label: str):
 
         rook_col = 0 if 'queenside' in move_label else 7 if 'kingside' in move_label else None
 
