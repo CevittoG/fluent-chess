@@ -85,6 +85,10 @@ class Board:
 
     def perform_castling(self, end_position: tuple[int, int], move_label: str):
 
+        if 'queenside' not in move_label and 'kingside' not in move_label:
+            cute_print(f"'{move_label}' label is not valid. Must be 'empty-queenside_castling' or 'empty-kingside_castling'", 'error', 'red')
+            sys.exit()
+
         rook_col = 0 if 'queenside' in move_label else 7 if 'kingside' in move_label else None
 
         rook_position = end_position[0], rook_col
