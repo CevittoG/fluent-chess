@@ -18,6 +18,9 @@ class Piece:
         self.movements.append(new_position)
         self.current_square = new_position
 
+    def capture(self, piece_taken):
+        self.captured.append(piece_taken)
+
 
 class King(Piece):
     def __init__(self, color, current_square):
@@ -256,13 +259,13 @@ class Pawn(Piece):
         if row == (6 if self.color == "white" else 1) and board.get_piece_at((row + move_direction, col)) is None and board.get_piece_at((row + 2 * move_direction, col)) is None:
             valid_moves.append(((row + 2 * move_direction, col), 'empty-standard'))
 
-        # Additional logic for "en passant" (in passing)
+        # Additional logic for "en passant" (in passing) ToDo: Complete validation
         passing_piece = board.get_piece_at((row, col + 1))
         if passing_piece is not None and passing_piece.color != self.color and len(passing_piece.movements) == 2:
-            valid_moves.append(((row + move_direction, col + 1), 'opponent-right_passant'))
+            valid_moves.append(((row + move_direction, col + 1), 'empty-right_passant'))
         passing_piece = board.get_piece_at((row, col - 1))
         if passing_piece is not None and passing_piece.color != self.color and len(passing_piece.movements) == 2:
-            valid_moves.append(((row + move_direction, col - 1), 'opponent-left_passant'))
+            valid_moves.append(((row + move_direction, col - 1), 'empty-left_passant'))
 
         # Capture right diagonal moves (if enemy piece is present)
         if 0 <= row + move_direction < 8 and 0 <= col + 1 < 8 and board.get_piece_at((row + move_direction, col + 1)) is not None and board.get_piece_at((row + move_direction, col + 1)).color != self.color:
