@@ -8,6 +8,8 @@ class Board:
     def __init__(self):
         self.board: list[list] = [[None for _ in range(8)] for _ in range(8)]
         self.setup_board()
+        self.log = []
+        self.turn_nm = 1
 
     def setup_board(self):
         # Initialize board with starting piece placements
@@ -56,21 +58,36 @@ class Board:
             if not validated_end_position:
                 cute_print(f"{piece.color}_{piece.type} at {start_position} can't move to {end_position}", f'{piece.color}_{piece.type}', 'yellow')
             # Check if piece found can move to end_position
-            elif end_position == validated_end_position:
+            else:
+                special_move = False
+                capture_piece = False
+
                 if 'opponent' in move_label:
                     self.capture_piece(piece, end_position)
+                    capture_piece = self.get_piece_at(end_position).type.title()
 
-                if isinstance(piece, Pawn) and end_position[0] in (0, 7):   # Pawn promotion
+                # Pawn promotion
+                if isinstance(piece, Pawn) and end_position[0] in (0, 7):
                     self.perform_standard_move(piece, start_position, end_position)
                     self.perform_promotion(piece, end_position)
-                elif isinstance(piece, Pawn) and 'passant' in move_label:   # Pawn passing
+                    special_move = 'Promotion'
+                # Pawn passing
+                elif isinstance(piece, Pawn) and 'passant' in move_label:
                     self.perform_standard_move(piece, start_position, end_position)
                     self.perform_en_passant(piece, start_position, move_label)
-                elif isinstance(piece, King) and 'castling' in move_label:  # King castling
+                    special_move = 'En Passant'
+                    capture_piece = 'Pawn'
+                # King castling
+                elif isinstance(piece, King) and 'castling' in move_label:
                     self.perform_castling(end_position, move_label)
                     self.perform_standard_move(piece, start_position, end_position)
+                    special_move = 'Castling'
+                # Standard move
                 else:
                     self.perform_standard_move(piece, start_position, end_position)
+
+                self.record_log(piece.color.title(), piece.type.title(), start_position, end_position, special_move, capture_piece)
+                self.turn_nm += 1
 
     def capture_piece(self, attacker_piece: Piece, position_taken: tuple[int, int]):
         piece_taken = self.get_piece_at(position_taken)
@@ -90,7 +107,6 @@ class Board:
         # Update the board state
         self.board[start_position[0]][start_position[1]] = None
         self.board[end_position[0]][end_position[1]] = piece
-        cute_print(f"{piece.color}_{piece.type}: {start_position} -> {end_position}", f'{piece.color}_{piece.type}')
 
     def perform_promotion(self, piece: Pawn, end_position: tuple[int, int]):
         self.board[end_position[0]][end_position[1]] = Queen(piece.color, end_position)  # ToDo: Choose a piece to promote to (queen, rook, bishop, knight)")
@@ -140,3 +156,15 @@ class Board:
                 piece = self.board[row][col]
                 new_board.board[row][col] = piece if piece is not None else None
         return new_board
+
+    def record_log(self, player: str, piece: str, s_position: tuple, e_position: tuple, special: Union[bool, str] = False, capture: Union[bool, str] = False):
+        record = {'TurnNumber': self.turn_nm,
+                  'Player': player,
+                  'Move': {'Piece': piece,
+                           'StartPosition': s_position,
+                           'EndPosition': e_position,
+                           'Special': special,
+                           'Captured': capture},
+                  'AI': {}}
+        self.log.append(record)
+        cute_print(f"{record}", 'write')
