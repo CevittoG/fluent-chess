@@ -3,25 +3,30 @@ import pygame
 import pathlib
 from src.utils import cute_print
 
-# Load piece images based on your file structure
-IMG_DIRECTORY = pathlib.Path(__file__).absolute().parent.parent / 'images'
+MEDIA_DIRECTORY = pathlib.Path(__file__).absolute().parent.parent / 'media'
+
+# Image settings
+IMG_DIRECTORY = MEDIA_DIRECTORY / 'images'
 PIECES_NAMES = ('king', 'queen', 'bishop', 'knight', 'rook', 'pawn')
 PIECES_COLORS = ('white', 'black')
 PIECES_IMAGES = {f"{color}_{name}": pygame.image.load(str(IMG_DIRECTORY / f"{color}_{name}.png")) for color in PIECES_COLORS for name in PIECES_NAMES}
+
+# Font settings
+FONT_DIRECTORY = MEDIA_DIRECTORY / 'fonts'
+FONT_TTF_FILENAME = 'consola'  # 'micross' 'DMSans-Regular' 'verdana' 'Ubuntu-Regular'
+FONT_TYPE = str(FONT_DIRECTORY / f'{FONT_TTF_FILENAME}.ttf')
+FONT_SIZE = 20
+SQUARE_FONT_SIZE = 10
+FONT_COLOR = (255, 255, 255)  # (242, 242, 242)
+
+# Icon Settings
+ICON_DIRECTORY = MEDIA_DIRECTORY / 'icons'
 
 # Board Measurements
 BOARD_PX_SIZE = 800
 SQUARE_PX_SIZE = BOARD_PX_SIZE // 8
 BOARD_MARGIN = SQUARE_PX_SIZE // 2
 PIECE_PX_SIZE = list(PIECES_IMAGES.values())[0].get_size()
-
-# Font settings
-FONT_SIZE = 20
-SQUARE_FONT_SIZE = 10
-FONT_DIRECTORY = pathlib.Path(__file__).absolute().parent.parent / 'fonts'
-FONT_TTF_FILENAME = 'consola'  # 'micross' 'DMSans-Regular' 'verdana' 'Ubuntu-Regular'
-FONT_TYPE = str(FONT_DIRECTORY / f'{FONT_TTF_FILENAME}.ttf')
-FONT_COLOR = (255, 255, 255)  # (242, 242, 242)
 
 # Colors
 BACKGROUND_COLOR = (40, 40, 40)  # (58, 58, 58)
