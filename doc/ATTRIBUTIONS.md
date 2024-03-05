@@ -3,3 +3,6 @@
 #### Colors
 - Black: #000000, #525150
 - White: #FFFFFF, #C7C4C2
+
+## Chess Rules
+FIDE (Fédération Internationale des Échecs or International Chess Federation) [Laws Of Chess](https://www.fide.com/FIDE/handbook/LawsOfChess.pdf)
