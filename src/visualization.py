@@ -9,21 +9,27 @@ PIECES_NAMES = ('king', 'queen', 'bishop', 'knight', 'rook', 'pawn')
 PIECES_COLORS = ('white', 'black')
 PIECES_IMAGES = {f"{color}_{name}": pygame.image.load(str(IMG_DIRECTORY / f"{color}_{name}.png")) for color in PIECES_COLORS for name in PIECES_NAMES}
 
+# Board Measurements
 BOARD_PX_SIZE = 800
-SQUARE_PX_SIZE = BOARD_PX_SIZE / 8
+SQUARE_PX_SIZE = BOARD_PX_SIZE // 8
+BOARD_MARGIN = SQUARE_PX_SIZE // 2
 PIECE_PX_SIZE = list(PIECES_IMAGES.values())[0].get_size()
 
-BOARD_LIGHT_COLOR = (255, 255, 255)
-BOARD_DARK_COLOR = (0, 0, 0)
-HIGHLIGHT_COLOR = (255, 227, 128)  # soft yellow
-SUCCESS_COLOR = (121, 242, 192)    # soft green
-ERROR_COLOR = (255, 86, 48)        # soft red
-# (252, 232, 58) yellow
-# (86, 240, 0) green
-# (255, 56, 56) red
-# (255, 179, 2) orange
-# (45, 204, 255) light blue
-# (164, 171, 182) grey
+# Font settings
+FONT_SIZE = 20
+SQUARE_FONT_SIZE = 10
+FONT_DIRECTORY = pathlib.Path(__file__).absolute().parent.parent / 'fonts'
+FONT_TTF_FILENAME = 'consola'  # 'micross' 'DMSans-Regular' 'verdana' 'Ubuntu-Regular'
+FONT_TYPE = str(FONT_DIRECTORY / f'{FONT_TTF_FILENAME}.ttf')
+FONT_COLOR = (255, 255, 255)  # (242, 242, 242)
+
+# Colors
+BACKGROUND_COLOR = (40, 40, 40)  # (58, 58, 58)
+BOARD_LIGHT_COLOR = (247, 243, 235)
+BOARD_DARK_COLOR = (158, 122, 91)
+HIGHLIGHT_COLOR = (255, 215, 0)
+POSSIBLE_MOVES_COLOR = (102, 187, 106)  # (153, 204, 0) or (139, 172, 139)
+POSSIBLE_CAPTURES_COLOR = (204, 0, 0)
 
 
 def calculate_piece_size(square_size):
@@ -52,24 +58,37 @@ def calculate_piece_size(square_size):
     return scaled_width, scaled_height
 
 
-def draw_board(screen, board: Board):
+def draw_board(screen):
     """
     Iterates through each square on the board and draws a colored rectangle using pygame.draw.rect, alternating colors for a checkerboard pattern.
     :param screen:
-    :param board:
+    :param font:
     :return:
     """
+    font = pygame.font.Font(FONT_TYPE, SQUARE_PX_SIZE // 10)
     # Iterate over each square
     for row in range(8):
         for col in range(8):
             # Determine square color based on row and column parity
             square_color = BOARD_LIGHT_COLOR if (row + col) % 2 == 0 else BOARD_DARK_COLOR
-
             # Create a rectangle representing the square
-            square_rect = pygame.Rect(col * SQUARE_PX_SIZE, row * SQUARE_PX_SIZE, SQUARE_PX_SIZE, SQUARE_PX_SIZE)
-
+            square_rect = pygame.Rect(col * SQUARE_PX_SIZE + BOARD_MARGIN, row * SQUARE_PX_SIZE + BOARD_MARGIN, SQUARE_PX_SIZE, SQUARE_PX_SIZE)
             # Fill the rectangle with the corresponding color
             pygame.draw.rect(screen, square_color, square_rect)
+
+            if col == 0:
+                # Determine text color based on row and column parity
+                text_color = BOARD_DARK_COLOR if (row + col) % 2 == 0 else BOARD_LIGHT_COLOR
+
+                # Row numbers
+                row_number = font.render(str(row + 1), True, text_color)  # Convert number to string
+                row_number_position = (col * SQUARE_PX_SIZE + SQUARE_FONT_SIZE // 5 + BOARD_MARGIN, row * SQUARE_PX_SIZE + SQUARE_PX_SIZE - SQUARE_FONT_SIZE * 2 + BOARD_MARGIN)
+                screen.blit(row_number, row_number_position)
+
+                # Col letters
+                col_letter = font.render(chr(ord('A') + row), True, text_color)
+                col_letter_position = (row * SQUARE_PX_SIZE + SQUARE_PX_SIZE - SQUARE_FONT_SIZE * 2 + BOARD_MARGIN, col * SQUARE_PX_SIZE + SQUARE_FONT_SIZE // 5 + BOARD_MARGIN)
+                screen.blit(col_letter, col_letter_position)
 
 
 def draw_pieces(screen, board: Board, piece_images: dict, selected_piece_row: int, selected_piece_col: int):
@@ -103,29 +122,19 @@ def draw_pieces(screen, board: Board, piece_images: dict, selected_piece_row: in
                 # Calculate piece image position based on mouse (if selected)
                 if row == selected_piece_row and col == selected_piece_col:
                     mouse_x, mouse_y = pygame.mouse.get_pos()
-                    square_x = int(mouse_x // SQUARE_PX_SIZE) * SQUARE_PX_SIZE
-                    square_y = int(mouse_y // SQUARE_PX_SIZE) * SQUARE_PX_SIZE
+                    square_x = ((mouse_x - BOARD_MARGIN) // SQUARE_PX_SIZE) * SQUARE_PX_SIZE
+                    square_y = ((mouse_y - BOARD_MARGIN) // SQUARE_PX_SIZE) * SQUARE_PX_SIZE
 
                 else:
                     square_x = col * SQUARE_PX_SIZE
                     square_y = row * SQUARE_PX_SIZE
 
                 # Center the scaled piece image within the square
-                piece_center_x = square_x + SQUARE_PX_SIZE // 2 - scaled_piece_image.get_width() // 2
-                piece_center_y = square_y + SQUARE_PX_SIZE // 2 - scaled_piece_image.get_height() // 2
+                piece_center_x = square_x + SQUARE_PX_SIZE // 2 - scaled_piece_image.get_width() // 2 + BOARD_MARGIN
+                piece_center_y = square_y + SQUARE_PX_SIZE // 2 - scaled_piece_image.get_height() // 2 + BOARD_MARGIN
 
                 # Draw the scaled piece at the calculated center position
                 screen.blit(scaled_piece_image, (piece_center_x, piece_center_y))
-
-
-def print_board(board: Board):
-    for row in board:
-        for piece in row:
-            if piece is None:
-                print("·", end=" ")
-            else:
-                print(piece.color[0] + piece.type[0].upper(), end=" ")
-        print()  # New line after each row
 
 
 def highlight_square(screen, valid_moves: list[tuple], color: tuple[int, int, int]):
@@ -139,5 +148,25 @@ def highlight_square(screen, valid_moves: list[tuple], color: tuple[int, int, in
     """
     for row, col in valid_moves:
         # Create a rectangle representing the square
-        square_rect = pygame.Rect(col * SQUARE_PX_SIZE, row * SQUARE_PX_SIZE, SQUARE_PX_SIZE, SQUARE_PX_SIZE)
+        square_rect = pygame.Rect(col * SQUARE_PX_SIZE + BOARD_MARGIN, row * SQUARE_PX_SIZE + BOARD_MARGIN, SQUARE_PX_SIZE, SQUARE_PX_SIZE)
         pygame.draw.rect(screen, color, square_rect, width=8)
+
+
+def render_players_info(screen, font: pygame.font.Font):
+    # Black Player
+    black_text = font.render('B:', True, FONT_COLOR)
+    black_text_position = (BOARD_MARGIN, (BOARD_MARGIN - FONT_SIZE) // 2)
+    screen.blit(black_text, black_text_position)
+
+    black_c_text = font.render('Captured:', True, FONT_COLOR)
+    black_c_text_position = (BOARD_MARGIN + SQUARE_PX_SIZE * 3, (BOARD_MARGIN - FONT_SIZE) // 2)
+    screen.blit(black_c_text, black_c_text_position)
+
+    # White Player
+    white_text = font.render('W:', True, FONT_COLOR)
+    white_text_position = (BOARD_MARGIN, BOARD_PX_SIZE + BOARD_MARGIN + ((BOARD_MARGIN - FONT_SIZE) // 2))
+    screen.blit(white_text, white_text_position)
+
+    white_c_text = font.render('Captured:', True, FONT_COLOR)
+    white_c_text_position = (BOARD_MARGIN + SQUARE_PX_SIZE * 3, BOARD_PX_SIZE + BOARD_MARGIN + ((BOARD_MARGIN - FONT_SIZE) // 2))
+    screen.blit(white_c_text, white_c_text_position)

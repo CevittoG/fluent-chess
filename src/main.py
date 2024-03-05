@@ -1,7 +1,7 @@
 import pygame
-from src import Piece, Board
-from src.visualization import draw_board, draw_pieces, highlight_square
-from src.visualization import PIECES_IMAGES, BOARD_PX_SIZE, SQUARE_PX_SIZE, SUCCESS_COLOR, ERROR_COLOR
+from src import Board
+from src.visualization import draw_board, draw_pieces, highlight_square, render_players_info
+from src.visualization import PIECES_IMAGES, BOARD_PX_SIZE, SQUARE_PX_SIZE, POSSIBLE_MOVES_COLOR, POSSIBLE_CAPTURES_COLOR, FONT_TYPE, FONT_SIZE, BOARD_MARGIN, BACKGROUND_COLOR
 from src.utils import cute_print
 
 
@@ -16,8 +16,9 @@ def main():
     pygame.init()
 
     # Set screen size and caption
-    screen = pygame.display.set_mode((BOARD_PX_SIZE, BOARD_PX_SIZE))
+    screen = pygame.display.set_mode((BOARD_PX_SIZE*2, BOARD_PX_SIZE + SQUARE_PX_SIZE))
     pygame.display.set_caption("Chess Sage")
+    game_font = pygame.font.Font(FONT_TYPE, FONT_SIZE)
 
     # Create a game board object
     game_board = Board()
@@ -36,8 +37,8 @@ def main():
                 mouse_is_down = True
                 # Check if a piece is clicked within the board area
                 mouse_x, mouse_y = pygame.mouse.get_pos()
-                row = int(mouse_y // SQUARE_PX_SIZE)
-                col = int(mouse_x // SQUARE_PX_SIZE)
+                row = (mouse_y - BOARD_MARGIN) // SQUARE_PX_SIZE
+                col = (mouse_x - BOARD_MARGIN) // SQUARE_PX_SIZE
 
                 if 0 <= row < 8 and 0 <= col < 8:
                     SEL_PIECE = game_board.get_piece_at((row, col))
@@ -52,8 +53,8 @@ def main():
                 # Check if a piece is released on a valid square
                 if SEL_PIECE is not None:
                     mouse_x, mouse_y = pygame.mouse.get_pos()
-                    new_row = int(mouse_y // SQUARE_PX_SIZE)
-                    new_col = int(mouse_x // SQUARE_PX_SIZE)
+                    new_row = (mouse_y - BOARD_MARGIN) // SQUARE_PX_SIZE
+                    new_col = (mouse_x - BOARD_MARGIN) // SQUARE_PX_SIZE
 
                     # Handle piece movement
                     if 0 <= new_row < 8 and 0 <= new_col < 8:
@@ -69,12 +70,14 @@ def main():
         # (Optional) Perform AI move calculation (if applicable)
 
         # Render the game state (board, pieces, etc.)
-        screen.fill((255, 255, 255))  # Set background color
+        screen.fill(BACKGROUND_COLOR)  # Set background color
         # Prepare light and dark squares
-        draw_board(screen, game_board)
+        draw_board(screen)
+        # Render players info
+        render_players_info(screen, game_font)
         # Prepare posible moves
-        highlight_square(screen, [position for position, label in valid_moves if 'empty' in label], SUCCESS_COLOR)
-        highlight_square(screen, [position for position, label in valid_moves if 'opponent' in label], ERROR_COLOR)
+        highlight_square(screen, [position for position, label in valid_moves if 'empty' in label], POSSIBLE_MOVES_COLOR)
+        highlight_square(screen, [position for position, label in valid_moves if 'opponent' in label], POSSIBLE_CAPTURES_COLOR)
         # Prepare every piece in the board
         draw_pieces(screen, game_board, PIECES_IMAGES, SEL_PIECE_ROW, SEL_PIECE_COL)
 
