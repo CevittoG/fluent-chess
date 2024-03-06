@@ -1,7 +1,12 @@
 from src import Board, Piece
 import pygame
 import pathlib
-from src.utils import cute_print
+from src.utils import cute_print, position_to_chess_notation, move_to_chess_notation
+
+# Board Measurements
+BOARD_PX_SIZE = 800
+SQUARE_PX_SIZE = BOARD_PX_SIZE // 8
+BOARD_MARGIN = SQUARE_PX_SIZE // 2
 
 MEDIA_DIRECTORY = pathlib.Path(__file__).absolute().parent.parent / 'media'
 
@@ -10,23 +15,21 @@ IMG_DIRECTORY = MEDIA_DIRECTORY / 'images'
 PIECES_NAMES = ('king', 'queen', 'bishop', 'knight', 'rook', 'pawn')
 PIECES_COLORS = ('white', 'black')
 PIECES_IMAGES = {f"{color}_{name}": pygame.image.load(str(IMG_DIRECTORY / f"{color}_{name}.png")) for color in PIECES_COLORS for name in PIECES_NAMES}
+PIECE_PX_SIZE = list(PIECES_IMAGES.values())[0].get_size()
 
 # Font settings
 FONT_DIRECTORY = MEDIA_DIRECTORY / 'fonts'
 FONT_TTF_FILENAME = 'consola'  # 'micross' 'DMSans-Regular' 'verdana' 'Ubuntu-Regular'
 FONT_TYPE = str(FONT_DIRECTORY / f'{FONT_TTF_FILENAME}.ttf')
-FONT_SIZE = 20
-SQUARE_FONT_SIZE = 10
+FONT_SIZE = BOARD_MARGIN // 3
+SQUARE_FONT_SIZE = FONT_SIZE // 2
 FONT_COLOR = (255, 255, 255)  # (242, 242, 242)
 
 # Icon Settings
 ICON_DIRECTORY = MEDIA_DIRECTORY / 'icons'
-
-# Board Measurements
-BOARD_PX_SIZE = 800
-SQUARE_PX_SIZE = BOARD_PX_SIZE // 8
-BOARD_MARGIN = SQUARE_PX_SIZE // 2
-PIECE_PX_SIZE = list(PIECES_IMAGES.values())[0].get_size()
+ICON_NAMES = ('king', 'queen', 'bishop', 'knight', 'rook', 'pawn', 'castling', 'promotion', 'sword', 'chess-clock')
+ICONS = {f"{name}": pygame.image.load(str(ICON_DIRECTORY / f"{name}.png")) for name in ICON_NAMES}
+ICON_PX_SIZE = list(ICONS.values())[0].get_size()
 
 # Colors
 BACKGROUND_COLOR = (40, 40, 40)  # (58, 58, 58)
@@ -37,7 +40,7 @@ POSSIBLE_MOVES_COLOR = (102, 187, 106)  # (153, 204, 0) or (139, 172, 139)
 POSSIBLE_CAPTURES_COLOR = (204, 0, 0)
 
 
-def calculate_piece_size(square_size):
+def calculate_piece_size():
     """
     Calculates the appropriate size for a piece image, maintaining aspect ratio.
 
@@ -52,8 +55,21 @@ def calculate_piece_size(square_size):
     original_width, original_height = PIECE_PX_SIZE
 
     # Calculate the maximum allowed size based on the square dimensions
-    square_size *= 0.85
-    max_size = min(square_size, original_width, original_height)
+    max_size = min(SQUARE_PX_SIZE * 0.85, original_width, original_height)
+
+    # Maintain aspect ratio while scaling
+    scale_factor = max_size / original_width
+    scaled_width = int(original_width * scale_factor)
+    scaled_height = int(original_height * scale_factor)
+
+    return scaled_width, scaled_height
+
+
+def calculate_icon_size():
+    original_width, original_height = ICON_PX_SIZE
+
+    # Calculate the maximum allowed size based on the margin dimensions
+    max_size = min(BOARD_MARGIN * 0.5, original_width, original_height)
 
     # Maintain aspect ratio while scaling
     scale_factor = max_size / original_width
@@ -86,7 +102,7 @@ def draw_board(screen):
                 text_color = BOARD_DARK_COLOR if (row + col) % 2 == 0 else BOARD_LIGHT_COLOR
 
                 # Row numbers
-                row_number = font.render(str(row + 1), True, text_color)  # Convert number to string
+                row_number = font.render(str(8 - row), True, text_color)  # Convert number to string ToDo: number should be reversed
                 row_number_position = (col * SQUARE_PX_SIZE + SQUARE_FONT_SIZE // 5 + BOARD_MARGIN, row * SQUARE_PX_SIZE + SQUARE_PX_SIZE - SQUARE_FONT_SIZE * 2 + BOARD_MARGIN)
                 screen.blit(row_number, row_number_position)
 
@@ -96,7 +112,7 @@ def draw_board(screen):
                 screen.blit(col_letter, col_letter_position)
 
 
-def draw_pieces(screen, board: Board, piece_images: dict, selected_piece_row: int, selected_piece_col: int):
+def draw_pieces(screen, board: Board, selected_piece_row: int, selected_piece_col: int):
     """
     Iterates through each square and checks if a piece is present. If so, it retrieves the piece image from a dictionary and uses pygame.blit to draw the image onto the corresponding square on the screen.
     :param screen:
@@ -106,7 +122,7 @@ def draw_pieces(screen, board: Board, piece_images: dict, selected_piece_row: in
     :param selected_piece_col:
     :return:
     """
-    piece_size = calculate_piece_size(int(SQUARE_PX_SIZE))
+    piece_size = calculate_piece_size()
 
     # Iterate over each square on the board
     for row in range(8):
@@ -120,7 +136,7 @@ def draw_pieces(screen, board: Board, piece_images: dict, selected_piece_row: in
 
             # If a piece is present, draw its image on the corresponding square
             if piece is not None:
-                piece_image = piece_images[f"{piece.color}_{piece.type}"]
+                piece_image = PIECES_IMAGES[f"{piece.color}_{piece.type}"]
                 # Scale the image (with appropriate filtering, if needed)
                 scaled_piece_image = pygame.transform.scale(piece_image, piece_size)
 
@@ -157,20 +173,44 @@ def highlight_square(screen, valid_moves: list[tuple], color: tuple[int, int, in
         pygame.draw.rect(screen, color, square_rect, width=8)
 
 
-def render_players_info(screen, font: pygame.font.Font):
-    # Black Player
-    black_text = font.render('B:', True, FONT_COLOR)
-    black_text_position = (BOARD_MARGIN, (BOARD_MARGIN - FONT_SIZE) // 2)
-    screen.blit(black_text, black_text_position)
+def render_players_info(screen, font: pygame.font.Font, board: Board):
+    def get_last_move_text_from_log(log_data: list[dict], player_color: str, icon_size: tuple) -> tuple:
+        p_data = [data for data in log_data if data['Player'] == player_color]
+
+        if len(p_data) < 1:
+            return pygame.Surface((0, 0)), ''
+
+        last_move = p_data[-1]['Move']
+        last_move_piece_icon = ICONS[f"{last_move['Piece'].lower()}"]
+        scaled_piece_icon = pygame.transform.scale(last_move_piece_icon, icon_size)
+
+        last_move_position = move_to_chess_notation(last_move['Piece'], last_move['StartPosition'], last_move['EndPosition'], capture=last_move['Captured'], special_move=last_move['Special'])
+        # last_move_position = f"{position_to_chess_notation(last_move['StartPosition'])} -> {position_to_chess_notation(last_move['EndPosition'])}"
+
+        return scaled_piece_icon, last_move_position
+
+    for player in ('Black', 'White'):
+        icon_size = calculate_icon_size()
+        # Get player data
+        last_p_moved, last_position = get_last_move_text_from_log(board.log, player, icon_size)
+
+        # Prepare player text
+        text_position_y = (BOARD_MARGIN - FONT_SIZE) // 2
+        text_position_y += BOARD_PX_SIZE + BOARD_MARGIN if player == 'White' else 0
+        # Player initial letter
+        player_text = font.render(f"{player[0]}:", True, FONT_COLOR)
+        screen.blit(player_text, (BOARD_MARGIN, text_position_y))
+        # Piece moved
+        icon_position_y = (BOARD_MARGIN - FONT_SIZE) // 3
+        icon_position_y += BOARD_PX_SIZE + BOARD_MARGIN if player == 'White' else 0
+        screen.blit(last_p_moved, (BOARD_MARGIN + FONT_SIZE*2, icon_position_y))
+        # Coordinates
+        position_text = font.render(f"{last_position}", True, FONT_COLOR)
+        screen.blit(position_text, (BOARD_MARGIN + FONT_SIZE*3 + icon_size[0], text_position_y))
 
     black_c_text = font.render('Captured:', True, FONT_COLOR)
     black_c_text_position = (BOARD_MARGIN + SQUARE_PX_SIZE * 3, (BOARD_MARGIN - FONT_SIZE) // 2)
     screen.blit(black_c_text, black_c_text_position)
-
-    # White Player
-    white_text = font.render('W:', True, FONT_COLOR)
-    white_text_position = (BOARD_MARGIN, BOARD_PX_SIZE + BOARD_MARGIN + ((BOARD_MARGIN - FONT_SIZE) // 2))
-    screen.blit(white_text, white_text_position)
 
     white_c_text = font.render('Captured:', True, FONT_COLOR)
     white_c_text_position = (BOARD_MARGIN + SQUARE_PX_SIZE * 3, BOARD_PX_SIZE + BOARD_MARGIN + ((BOARD_MARGIN - FONT_SIZE) // 2))

@@ -179,3 +179,84 @@ def find_position(moves: list[tuple[tuple[int, int], str]], position: tuple[int,
 
     return result
 
+
+def move_to_chess_notation(piece, start_position: tuple[int, int], end_position: tuple[int, int], capture: Union[bool, str], special_move: Union[bool, dict]) -> str:
+    """
+    Converts move data into algebraic chess notation.
+
+    Args:
+      piece: The piece involved in the move (e.g., 'P', 'N', 'R', 'B', 'Q', 'K').
+      start_position: A tuple representing the starting square (row, col).
+      end_position: A tuple representing the ending square (row, col).
+      capture: Boolean indicating if the move captures a piece (True) or not (False).
+      special_move: code from game logging
+            - queenside_castling
+            - kingside_castling
+            - queen_promotion
+            - bishop_promotion
+            - knight_promotion
+            - rook_promotion
+
+    Returns:
+      The algebraic notation string representing the move.
+    """
+    piece_notation = {'King': 'K', 'Queen': 'Q', 'Bishop': 'B', 'Knight': 'N', 'Rook': 'R', 'Pawn': 'P'}
+    piece = piece_notation[piece]
+
+    notation = ""
+
+    # Include piece name except for pawns and disambiguate if needed
+    if piece not in ('P', 'K'):
+        notation += piece
+
+    # Disambiguate based on starting file if necessary (multiple pieces can move to the same square)
+    if piece in ('R', 'N', 'B') and need_disambiguate(piece, start_position, end_position):
+        notation += chr(ord('A') + start_position[1])
+
+    # Add capture symbol if capturing a piece
+    if capture:
+        notation += "x"
+
+    # Add end position (file and rank)
+    notation += position_to_chess_notation(end_position)
+
+    if isinstance(special_move, dict):
+        # Add promotion symbol and piece type if promotion occurs
+        if special_move['Type'] == 'Promotion':
+            notation += "=" + piece_notation[special_move['Obs']]
+        # Handle castling moves
+        elif special_move['Type'] == 'Castling':
+            notation = "O-O" if special_move['Obs'] == 'Kingside' else "O-O-O"  # Kingside or Queenside castling
+
+    return notation
+
+
+def need_disambiguate(piece, start_position, end_position):
+    """
+    Checks if a piece move needs disambiguation based on starting and ending positions.
+
+    Args:
+        piece: The piece involved in the move (e.g., 'N', 'R', 'B').
+        start_position: A tuple representing the starting square (row, col).
+        end_position: A tuple representing the ending square (row, col).
+
+    Returns:
+        True if disambiguation is needed, False otherwise.
+    """
+
+    # Get pieces of the same type on the board (excluding the moving piece)
+    # Replace this logic with your actual board state representation to identify potential conflicts
+    other_pieces = []  # Replace with logic to find other pieces of the same type
+    conflicts = any(piece_position != start_position and move_to_chess_notation(piece, piece_position, end_position, False, False) == move_to_chess_notation(piece, start_position, end_position, False, False) for piece_position in other_pieces)
+
+    return conflicts and piece in ('R', 'N', 'B')
+
+
+def position_to_chess_notation(position: tuple[int, int]) -> str:
+    row, col = position
+    # Invert the row and column values to match chess notation (rank, file)
+    rank = 8 - row  # Rank starts from 8 and goes down to 1
+    file = chr(ord('A') + col)  # Convert column index to uppercase letter
+
+    return f"{file}{rank}"
+

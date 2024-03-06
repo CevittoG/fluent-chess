@@ -63,25 +63,25 @@ class Board:
                 capture_piece = False
 
                 if 'opponent' in move_label:
-                    self.capture_piece(piece, end_position)
                     capture_piece = self.get_piece_at(end_position).type.title()
+                    self.capture_piece(piece, end_position)
 
                 # Pawn promotion
                 if isinstance(piece, Pawn) and end_position[0] in (0, 7):
                     self.perform_standard_move(piece, start_position, end_position)
                     self.perform_promotion(piece, end_position)
-                    special_move = 'Promotion'
+                    special_move = {'Type': 'Promotion', 'Obs': 'Queen'}
                 # Pawn passing
                 elif isinstance(piece, Pawn) and 'passant' in move_label:
                     self.perform_standard_move(piece, start_position, end_position)
                     self.perform_en_passant(piece, start_position, move_label)
-                    special_move = 'En Passant'
+                    special_move = {'Type': 'En Passant', 'Obs': ''}  # ToDo: fix side
                     capture_piece = 'Pawn'
                 # King castling
                 elif isinstance(piece, King) and 'castling' in move_label:
                     self.perform_castling(end_position, move_label)
                     self.perform_standard_move(piece, start_position, end_position)
-                    special_move = 'Castling'
+                    special_move = {'Type': 'Castling', 'Obs': 'Kingside'}  # ToDo: fix side
                 # Standard move
                 else:
                     self.perform_standard_move(piece, start_position, end_position)
@@ -157,7 +157,7 @@ class Board:
                 new_board.board[row][col] = piece if piece is not None else None
         return new_board
 
-    def record_log(self, player: str, piece: str, s_position: tuple, e_position: tuple, special: Union[bool, str] = False, capture: Union[bool, str] = False):
+    def record_log(self, player: str, piece: str, s_position: tuple, e_position: tuple, special: dict = False, capture: Union[bool, str] = False):
         record = {'TurnNumber': self.turn_nm,
                   'Player': player,
                   'Move': {'Piece': piece,
