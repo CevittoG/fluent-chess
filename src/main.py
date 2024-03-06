@@ -1,7 +1,8 @@
 import pygame
+from pygame.locals import FULLSCREEN, RESIZABLE
 from src import Board
 from src.visualization import draw_board, draw_pieces, highlight_square, render_players_info
-from src.visualization import PIECES_IMAGES, BOARD_PX_SIZE, SQUARE_PX_SIZE, POSSIBLE_MOVES_COLOR, POSSIBLE_CAPTURES_COLOR, FONT_TYPE, FONT_SIZE, BOARD_MARGIN, BACKGROUND_COLOR
+from src.visualization import BOARD_PX_SIZE, SQUARE_PX_SIZE, POSSIBLE_MOVES_COLOR, POSSIBLE_CAPTURES_COLOR, FONT_TYPE, FONT_SIZE, BOARD_MARGIN, BACKGROUND_COLOR
 from src.utils import cute_print
 
 
@@ -16,12 +17,12 @@ def main():
     pygame.init()
 
     # Set screen size and caption
-    screen = pygame.display.set_mode((BOARD_PX_SIZE*2, BOARD_PX_SIZE + SQUARE_PX_SIZE))
+    screen = pygame.display.set_mode((BOARD_PX_SIZE*2, BOARD_PX_SIZE + SQUARE_PX_SIZE), RESIZABLE)
     pygame.display.set_caption("Chess Sage")
     game_font = pygame.font.Font(FONT_TYPE, FONT_SIZE)
 
     # Create a game board object
-    game_board = Board()
+    chessboard = Board()
 
     # (Optional) Initialize other game elements (e.g., AI, player information)
 
@@ -41,12 +42,12 @@ def main():
                 col = (mouse_x - BOARD_MARGIN) // SQUARE_PX_SIZE
 
                 if 0 <= row < 8 and 0 <= col < 8:
-                    SEL_PIECE = game_board.get_piece_at((row, col))
+                    SEL_PIECE = chessboard.get_piece_at((row, col))
                     SEL_PIECE_ROW = row
                     SEL_PIECE_COL = col
 
                     # Check posible moves for specific piece
-                    valid_moves = SEL_PIECE.get_valid_moves(game_board) if SEL_PIECE is not None else []
+                    valid_moves = SEL_PIECE.get_valid_moves(chessboard) if SEL_PIECE is not None else []
 
             elif event.type == pygame.MOUSEBUTTONUP:
                 mouse_is_down = False
@@ -59,7 +60,7 @@ def main():
                     # Handle piece movement
                     if 0 <= new_row < 8 and 0 <= new_col < 8:
                         # Move piece on board and update states
-                        game_board.move_piece(SEL_PIECE, (SEL_PIECE_ROW, SEL_PIECE_COL), (new_row, new_col), valid_moves)
+                        chessboard.move_piece(SEL_PIECE, (SEL_PIECE_ROW, SEL_PIECE_COL), (new_row, new_col), valid_moves)
 
                     # Reset selected piece information
                     SEL_PIECE = None
@@ -74,12 +75,12 @@ def main():
         # Prepare light and dark squares
         draw_board(screen)
         # Render players info
-        render_players_info(screen, game_font)
+        render_players_info(screen, game_font, chessboard)
         # Prepare posible moves
         highlight_square(screen, [position for position, label in valid_moves if 'empty' in label], POSSIBLE_MOVES_COLOR)
         highlight_square(screen, [position for position, label in valid_moves if 'opponent' in label], POSSIBLE_CAPTURES_COLOR)
         # Prepare every piece in the board
-        draw_pieces(screen, game_board, PIECES_IMAGES, SEL_PIECE_ROW, SEL_PIECE_COL)
+        draw_pieces(screen, chessboard, SEL_PIECE_ROW, SEL_PIECE_COL)
 
         # Update the display
         pygame.display.update()
