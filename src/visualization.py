@@ -2,6 +2,7 @@ from src import Board, Piece
 import pygame
 import pathlib
 from src.utils import cute_print, position_to_chess_notation, move_to_chess_notation
+from typing import Generator, Any
 
 # Board Measurements
 BOARD_PX_SIZE = 800
@@ -174,25 +175,30 @@ def highlight_square(screen, valid_moves: list[tuple], color: tuple[int, int, in
 
 
 def render_players_info(screen, font: pygame.font.Font, board: Board):
-    def get_last_move_text_from_log(log_data: list[dict], player_color: str, icon_size: tuple) -> tuple:
+    def get_data_from_log(log_data: list[dict], player_color: str, icon_size: tuple) -> tuple[pygame.Surface, str, list[pygame.Surface]]:
         p_data = [data for data in log_data if data['Player'] == player_color]
 
         if len(p_data) < 1:
-            return pygame.Surface((0, 0)), ''
+            return pygame.Surface((0, 0)), '', []
 
+        # Last piece moved
         last_move = p_data[-1]['Move']
         last_move_piece_icon = ICONS[f"{last_move['Piece'].lower()}"]
         scaled_piece_icon = pygame.transform.scale(last_move_piece_icon, icon_size)
 
+        # Chess notation for last move
         last_move_position = move_to_chess_notation(last_move['Piece'], last_move['StartPosition'], last_move['EndPosition'], capture=last_move['Captured'], special_move=last_move['Special'])
-        # last_move_position = f"{position_to_chess_notation(last_move['StartPosition'])} -> {position_to_chess_notation(last_move['EndPosition'])}"
 
-        return scaled_piece_icon, last_move_position
+        # Pieces captured by player_color
+        captured_pieces_names = (turn['Move']['Captured'] for turn in p_data if turn['Move']['Captured'] is not False)
+        captured_pieces = [pygame.transform.scale(ICONS[cp_name.lower()], icon_size) for cp_name in captured_pieces_names]
+
+        return scaled_piece_icon, last_move_position, captured_pieces
 
     for player in ('Black', 'White'):
         icon_size = calculate_icon_size()
         # Get player data
-        last_p_moved, last_position = get_last_move_text_from_log(board.log, player, icon_size)
+        last_p_moved, last_position, captured_icon_list = get_data_from_log(board.log, player, icon_size)
 
         # Prepare player text
         text_position_y = (BOARD_MARGIN - FONT_SIZE) // 2
@@ -200,7 +206,7 @@ def render_players_info(screen, font: pygame.font.Font, board: Board):
         # Player initial letter
         player_text = font.render(f"{player[0]}:", True, FONT_COLOR)
         screen.blit(player_text, (BOARD_MARGIN, text_position_y))
-        # Piece moved
+        # Piece moved icon
         icon_position_y = (BOARD_MARGIN - FONT_SIZE) // 3
         icon_position_y += BOARD_PX_SIZE + BOARD_MARGIN if player == 'White' else 0
         screen.blit(last_p_moved, (BOARD_MARGIN + FONT_SIZE*2, icon_position_y))
@@ -208,10 +214,12 @@ def render_players_info(screen, font: pygame.font.Font, board: Board):
         position_text = font.render(f"{last_position}", True, FONT_COLOR)
         screen.blit(position_text, (BOARD_MARGIN + FONT_SIZE*3 + icon_size[0], text_position_y))
 
-    black_c_text = font.render('Captured:', True, FONT_COLOR)
-    black_c_text_position = (BOARD_MARGIN + SQUARE_PX_SIZE * 3, (BOARD_MARGIN - FONT_SIZE) // 2)
-    screen.blit(black_c_text, black_c_text_position)
+        # ToDo: Clock... time played by player
 
-    white_c_text = font.render('Captured:', True, FONT_COLOR)
-    white_c_text_position = (BOARD_MARGIN + SQUARE_PX_SIZE * 3, BOARD_PX_SIZE + BOARD_MARGIN + ((BOARD_MARGIN - FONT_SIZE) // 2))
-    screen.blit(white_c_text, white_c_text_position)
+        # Prepare captured icons
+        sword_icon = pygame.transform.scale(ICONS['sword'], icon_size)
+        sword_icon_position = (BOARD_MARGIN + SQUARE_PX_SIZE * 3, icon_position_y)
+        screen.blit(sword_icon, sword_icon_position)
+        # Icons iteration
+        for i in range(len(captured_icon_list)):
+            screen.blit(captured_icon_list[i], (sword_icon_position[0] + icon_size[0] * (i + 2), icon_position_y))
