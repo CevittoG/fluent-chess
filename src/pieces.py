@@ -10,6 +10,9 @@ class Piece:
         self.movements: list[Tuple[int, int]] = [current_square]
         self.captured: list[Union[Piece, None]] = []
 
+    def __str__(self):
+        return f'{self.color}_{self.type}'
+
     def get_valid_moves(self, board) -> list[tuple[tuple, str]]:
         # Implement logic to check if the move is valid for the specific piece type. This will be overwritten by polymorphic behavior with subclasses (inherit)
         return []

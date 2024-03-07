@@ -1,4 +1,4 @@
-from src import Board, Piece
+from src import Board, Piece, GameState
 import pygame
 import pathlib
 from src.utils import cute_print, position_to_chess_notation, move_to_chess_notation
@@ -174,9 +174,9 @@ def highlight_square(screen, valid_moves: list[tuple], color: tuple[int, int, in
         pygame.draw.rect(screen, color, square_rect, width=8)
 
 
-def render_players_info(screen, font: pygame.font.Font, board: Board):
+def render_players_info(screen, font: pygame.font.Font, game: GameState):
     def get_data_from_log(log_data: list[dict], player_color: str, icon_size: tuple) -> tuple[pygame.Surface, str, list[pygame.Surface]]:
-        p_data = [data for data in log_data if data['Player'] == player_color]
+        p_data = [data for data in log_data if data['PlayerColor'] == player_color]
 
         if len(p_data) < 1:
             return pygame.Surface((0, 0)), '', []
@@ -198,7 +198,7 @@ def render_players_info(screen, font: pygame.font.Font, board: Board):
     for player in ('Black', 'White'):
         icon_size = calculate_icon_size()
         # Get player data
-        last_p_moved, last_position, captured_icon_list = get_data_from_log(board.log, player, icon_size)
+        last_p_moved, last_position, captured_icon_list = get_data_from_log(game.log, player, icon_size)
 
         # Prepare player text
         text_position_y = (BOARD_MARGIN - FONT_SIZE) // 2

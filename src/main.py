@@ -1,6 +1,6 @@
 import pygame
 from pygame.locals import FULLSCREEN, RESIZABLE
-from src import Board
+from src import GameState, Board
 from src.visualization import draw_board, draw_pieces, highlight_square, render_players_info
 from src.visualization import BOARD_PX_SIZE, SQUARE_PX_SIZE, POSSIBLE_MOVES_COLOR, POSSIBLE_CAPTURES_COLOR, FONT_TYPE, FONT_SIZE, BOARD_MARGIN, BACKGROUND_COLOR
 from src.utils import cute_print
@@ -21,19 +21,19 @@ def main():
     pygame.display.set_caption("Chess Sage")
     game_font = pygame.font.Font(FONT_TYPE, FONT_SIZE)
 
-    # Create a game board object
+    # Create a game classes
     chessboard = Board()
+    game = GameState(chessboard, None, None)  # ToDo: Create input for players names
 
     # (Optional) Initialize other game elements (e.g., AI, player information)
 
     # Main game loop
-    running = True
     valid_moves = []
-    while running:
+    while game.state == 'running':
         # Handle user input (e.g., mouse clicks for move selection)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
+                game.stop()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_is_down = True
                 # Check if a piece is clicked within the board area
@@ -60,7 +60,7 @@ def main():
                     # Handle piece movement
                     if 0 <= new_row < 8 and 0 <= new_col < 8:
                         # Move piece on board and update states
-                        chessboard.move_piece(SEL_PIECE, (SEL_PIECE_ROW, SEL_PIECE_COL), (new_row, new_col), valid_moves)
+                        game.turn((SEL_PIECE_ROW, SEL_PIECE_COL), (new_row, new_col), valid_moves)
 
                     # Reset selected piece information
                     SEL_PIECE = None
@@ -75,7 +75,7 @@ def main():
         # Prepare light and dark squares
         draw_board(screen)
         # Render players info
-        render_players_info(screen, game_font, chessboard)
+        render_players_info(screen, game_font, game)
         # Prepare posible moves
         highlight_square(screen, [position for position, label in valid_moves if 'empty' in label], POSSIBLE_MOVES_COLOR)
         highlight_square(screen, [position for position, label in valid_moves if 'opponent' in label], POSSIBLE_CAPTURES_COLOR)

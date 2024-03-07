@@ -8,8 +8,6 @@ class Board:
     def __init__(self):
         self.board: list[list] = [[None for _ in range(8)] for _ in range(8)]
         self.setup_board()
-        self.log = []
-        self.turn_nm = 1
 
     def setup_board(self):
         # Initialize board with starting piece placements
@@ -48,15 +46,18 @@ class Board:
                 if filter_func(piece, filter_value):
                     yield piece
 
-    def move_piece(self, piece, start_position: Tuple[int, int], end_position: Tuple[int, int], piece_valid_moves: list[tuple[tuple[int, int], str]]):
+    def move_piece(self, start_position: Tuple[int, int], end_position: Tuple[int, int], piece_valid_moves: list[tuple[tuple[int, int], str]]) -> Tuple[Piece, tuple, tuple, Union[bool, str], Union[bool, str]]:
+        piece = self.get_piece_at(start_position)
         # Check if there's a piece at start_position
         if piece is None:
             cute_print(f'There is no piece in position {start_position}', 'error', 'red')
+            return False
         else:
             validated_end_position, move_label = find_position(piece_valid_moves, end_position)
             # Check if piece found can't move to end_position
             if not validated_end_position:
-                cute_print(f"{piece.color}_{piece.type} at {start_position} can't move to {end_position}", f'{piece.color}_{piece.type}', 'yellow')
+                cute_print(f"{piece} at {start_position} can't move to {end_position}", f'{piece}', 'yellow')
+                return False
             # Check if piece found can move to end_position
             else:
                 special_move = False
@@ -86,8 +87,7 @@ class Board:
                 else:
                     self.perform_standard_move(piece, start_position, end_position)
 
-                self.record_log(piece.color.title(), piece.type.title(), start_position, end_position, special_move, capture_piece)
-                self.turn_nm += 1
+                return piece, start_position, end_position, special_move, capture_piece
 
     def capture_piece(self, attacker_piece: Piece, position_taken: tuple[int, int]):
         piece_taken = self.get_piece_at(position_taken)
@@ -156,15 +156,3 @@ class Board:
                 piece = self.board[row][col]
                 new_board.board[row][col] = piece if piece is not None else None
         return new_board
-
-    def record_log(self, player: str, piece: str, s_position: tuple, e_position: tuple, special: dict = False, capture: Union[bool, str] = False):
-        record = {'TurnNumber': self.turn_nm,
-                  'Player': player,
-                  'Move': {'Piece': piece,
-                           'StartPosition': s_position,
-                           'EndPosition': e_position,
-                           'Special': special,
-                           'Captured': capture},
-                  'AI': {}}
-        self.log.append(record)
-        cute_print(f"{record}", 'write')
