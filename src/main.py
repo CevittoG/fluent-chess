@@ -1,7 +1,7 @@
 import pygame
 from pygame.locals import FULLSCREEN, RESIZABLE
 from src import GameState, Board
-from src.visualization import draw_board, draw_pieces, highlight_square, render_players_info
+from src.visualization import draw_board, draw_pieces, highlight_square, render_players_info, render_square_info
 from src.visualization import BOARD_PX_SIZE, SQUARE_PX_SIZE, POSSIBLE_MOVES_COLOR, POSSIBLE_CAPTURES_COLOR, FONT_TYPE, FONT_SIZE, BOARD_MARGIN, BACKGROUND_COLOR
 from src.utils import cute_print
 
@@ -71,16 +71,19 @@ def main():
         # (Optional) Perform AI move calculation (if applicable)
 
         # Render the game state (board, pieces, etc.)
-        screen.fill(BACKGROUND_COLOR)  # Set background color
-        # Prepare light and dark squares
+        # Set background color
+        screen.fill(BACKGROUND_COLOR)
+        # Light and dark squares
         draw_board(screen)
-        # Render players info
+        # Players info
         render_players_info(screen, game_font, game)
-        # Prepare posible moves
+        # Posible moves
         highlight_square(screen, [position for position, label in valid_moves if 'empty' in label], POSSIBLE_MOVES_COLOR)
         highlight_square(screen, [position for position, label in valid_moves if 'opponent' in label], POSSIBLE_CAPTURES_COLOR)
-        # Prepare every piece in the board
+        # Every piece in the board
         draw_pieces(screen, chessboard, SEL_PIECE_ROW, SEL_PIECE_COL)
+        # Square information
+        render_square_info(screen, chessboard)
 
         # Update the display
         pygame.display.update()

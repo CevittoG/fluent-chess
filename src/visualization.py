@@ -87,7 +87,7 @@ def draw_board(screen):
     :param font:
     :return:
     """
-    font = pygame.font.Font(FONT_TYPE, SQUARE_PX_SIZE // 10)
+    font = pygame.font.Font(FONT_TYPE, SQUARE_FONT_SIZE)  # SQUARE_PX_SIZE // 10)
     # Iterate over each square
     for row in range(8):
         for col in range(8):
@@ -103,7 +103,7 @@ def draw_board(screen):
                 text_color = BOARD_DARK_COLOR if (row + col) % 2 == 0 else BOARD_LIGHT_COLOR
 
                 # Row numbers
-                row_number = font.render(str(8 - row), True, text_color)  # Convert number to string ToDo: number should be reversed
+                row_number = font.render(str(8 - row), True, text_color)  # Convert number to string
                 row_number_position = (col * SQUARE_PX_SIZE + SQUARE_FONT_SIZE // 5 + BOARD_MARGIN, row * SQUARE_PX_SIZE + SQUARE_PX_SIZE - SQUARE_FONT_SIZE * 2 + BOARD_MARGIN)
                 screen.blit(row_number, row_number_position)
 
@@ -176,7 +176,7 @@ def highlight_square(screen, valid_moves: list[tuple], color: tuple[int, int, in
 
 def render_players_info(screen, font: pygame.font.Font, game: GameState):
     def get_data_from_log(log_data: list[dict], player_color: str, icon_size: tuple) -> tuple[pygame.Surface, str, list[pygame.Surface]]:
-        p_data = [data for data in log_data if data['PlayerColor'] == player_color]
+        p_data = [data for data in log_data if data['Player']['Color'] == player_color]
 
         if len(p_data) < 1:
             return pygame.Surface((0, 0)), '', []
@@ -223,3 +223,27 @@ def render_players_info(screen, font: pygame.font.Font, game: GameState):
         # Icons iteration
         for i in range(len(captured_icon_list)):
             screen.blit(captured_icon_list[i], (sword_icon_position[0] + icon_size[0] * (i + 2), icon_position_y))
+
+
+def render_square_info(screen, board):
+    mouse_x, mouse_y = pygame.mouse.get_pos()
+    row = ((mouse_y - BOARD_MARGIN) // SQUARE_PX_SIZE)
+    col = ((mouse_x - BOARD_MARGIN) // SQUARE_PX_SIZE)
+
+    if 0 <= row < 8 and 0 <= col < 8:
+        piece = board.get_piece_at((row, col))
+        piece_type = f': {piece.type.title()}' if piece is not None else ''
+        square = position_to_chess_notation((row, col))
+
+        mouse_text = f'{square}{piece_type}'
+        rect_diff = len(mouse_text) + 1 if len(mouse_text) == 2 else len(mouse_text) - 2  # ToDo: name could be better
+
+        font = pygame.font.Font(FONT_TYPE, FONT_SIZE)
+
+        # Rectangle
+        square_rect = pygame.Rect(mouse_x, mouse_y, FONT_SIZE * rect_diff, FONT_SIZE * 1.5)
+        pygame.draw.rect(screen, BACKGROUND_COLOR, square_rect, border_radius=8)
+
+        # Text
+        square_text = font.render(f"{mouse_text}", True, FONT_COLOR)
+        screen.blit(square_text, (mouse_x + FONT_SIZE, mouse_y + FONT_SIZE * 0.25))
