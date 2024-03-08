@@ -260,3 +260,22 @@ def position_to_chess_notation(position: tuple[int, int]) -> str:
 
     return f"{file}{rank}"
 
+
+def seconds_to_hms(seconds, milliseconds: bool = False):
+    """Converts a floating-point number of seconds into a string formatted as HH:MM:SS.
+        Args:
+        seconds: The number of seconds to convert (float).
+
+        Returns:
+        A string representing the time in HH:MM:SS format.
+    """
+    milliseconds = int((seconds % 1) * 1000) if milliseconds else False
+    seconds = int(seconds)  # Convert to whole seconds
+
+    hours = int(seconds // 3600)
+    minutes = int((seconds % 3600) // 60)
+    seconds = int(seconds % 60)
+
+    time_str = f"{hours:02d}:{minutes:02d}:{seconds:02d}.{milliseconds:02d}" if milliseconds else f"{hours:02d}:{minutes:02d}:{seconds:02d}"
+
+    return time_str

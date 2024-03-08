@@ -1,8 +1,8 @@
 import pygame
 from pygame.locals import FULLSCREEN, RESIZABLE
 from src import GameState, Board
-from src.visualization import draw_board, draw_pieces, highlight_square, render_players_info, render_square_info
-from src.visualization import BOARD_PX_SIZE, SQUARE_PX_SIZE, POSSIBLE_MOVES_COLOR, POSSIBLE_CAPTURES_COLOR, FONT_TYPE, FONT_SIZE, BOARD_MARGIN, BACKGROUND_COLOR
+from src.visualization import draw_board, draw_pieces, highlight_square, render_players_info, render_square_info, render_clock
+from src.visualization import BOARD_PX_SIZE, SQUARE_PX_SIZE, POSSIBLE_MOVES_COLOR, POSSIBLE_CAPTURES_COLOR, FONT_TYPE, FONT_PX_SIZE_M, MARGIN_PX_SIZE, BACKGROUND_COLOR
 from src.utils import cute_print
 
 
@@ -19,7 +19,7 @@ def main():
     # Set screen size and caption
     screen = pygame.display.set_mode((BOARD_PX_SIZE*2, BOARD_PX_SIZE + SQUARE_PX_SIZE), RESIZABLE)
     pygame.display.set_caption("Chess Sage")
-    game_font = pygame.font.Font(FONT_TYPE, FONT_SIZE)
+    game_font = pygame.font.Font(FONT_TYPE, FONT_PX_SIZE_M)
 
     # Create a game classes
     chessboard = Board()
@@ -29,6 +29,7 @@ def main():
 
     # Main game loop
     valid_moves = []
+    game.start()
     while game.state == 'running':
         game.update_elapsed_time()
         # Handle user input (e.g., mouse clicks for move selection)
@@ -39,8 +40,8 @@ def main():
                 mouse_is_down = True
                 # Check if a piece is clicked within the board area
                 mouse_x, mouse_y = pygame.mouse.get_pos()
-                row = (mouse_y - BOARD_MARGIN) // SQUARE_PX_SIZE
-                col = (mouse_x - BOARD_MARGIN) // SQUARE_PX_SIZE
+                row = (mouse_y - MARGIN_PX_SIZE) // SQUARE_PX_SIZE
+                col = (mouse_x - MARGIN_PX_SIZE) // SQUARE_PX_SIZE
 
                 if 0 <= row < 8 and 0 <= col < 8:
                     SEL_PIECE = chessboard.get_piece_at((row, col))
@@ -55,8 +56,8 @@ def main():
                 # Check if a piece is released on a valid square
                 if SEL_PIECE is not None:
                     mouse_x, mouse_y = pygame.mouse.get_pos()
-                    new_row = (mouse_y - BOARD_MARGIN) // SQUARE_PX_SIZE
-                    new_col = (mouse_x - BOARD_MARGIN) // SQUARE_PX_SIZE
+                    new_row = (mouse_y - MARGIN_PX_SIZE) // SQUARE_PX_SIZE
+                    new_col = (mouse_x - MARGIN_PX_SIZE) // SQUARE_PX_SIZE
 
                     # Handle piece movement
                     if 0 <= new_row < 8 and 0 <= new_col < 8:
@@ -76,15 +77,17 @@ def main():
         screen.fill(BACKGROUND_COLOR)
         # Light and dark squares
         draw_board(screen)
-        # Players info
-        render_players_info(screen, game_font, game)
         # Posible moves
         highlight_square(screen, [position for position, label in valid_moves if 'empty' in label], POSSIBLE_MOVES_COLOR)
         highlight_square(screen, [position for position, label in valid_moves if 'opponent' in label], POSSIBLE_CAPTURES_COLOR)
         # Every piece in the board
         draw_pieces(screen, chessboard, SEL_PIECE_ROW, SEL_PIECE_COL)
-        # Square information
+        # Square information flowing mouse position
         render_square_info(screen, chessboard)
+        # Players info
+        render_players_info(screen, game_font, game)
+        # Time
+        render_clock(screen, game)
 
         # Update the display
         pygame.display.update()

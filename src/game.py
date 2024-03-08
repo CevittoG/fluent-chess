@@ -1,5 +1,5 @@
 import time
-from src.utils import cute_print
+from src.utils import cute_print, seconds_to_hms
 from src.board import Board
 from src.pieces import Piece
 from typing import Union, Tuple, List, Any
@@ -10,6 +10,7 @@ class Player:
         self.name = name
         self.color = color
         self.time = 0
+        self.cumulative_time = 0
 
     def __str__(self):
         if self.name is None or self.name == '':
@@ -20,13 +21,13 @@ class Player:
 
 class GameState:
     def __init__(self, chessboard: Board, white_player_name: Union[str, None], black_player_name: Union[str, None]):
-        # Game state
-        self.state = 'running'
         # Timer
-        self.start_time = time.time()
-        self.time = 0
-        self.turn_change_mark = time.time()
-        self.turn_time = 0
+        self.start_time = None
+        self.time = None
+        self.turn_change_mark = None
+        self.turn_time = None
+        # Game state
+        self.state = 'waiting'
         # Logging
         self.log = []
         self.turn_nm = 1
@@ -34,16 +35,27 @@ class GameState:
         self.chessboard = chessboard
         # Players state
         self.black_player = None
+        self.black_player_name = black_player_name
         self.white_player = None
+        self.white_player_name = white_player_name
         self.current_player = None
-        self.setup_players(white_player_name, black_player_name)
 
-    def setup_players(self, white_player_name: Union[str, None], black_player_name: Union[str, None]):
+    def setup_players(self):
         # Create players
-        self.white_player = Player('white', white_player_name)
-        self.black_player = Player('black', black_player_name)
+        self.white_player = Player('white', self.white_player_name)
+        self.black_player = Player('black', self.black_player_name)
         # Set white player as first player
         self.current_player = self.white_player
+
+    def start(self):
+        self.state = 'running'
+        # Timer
+        self.start_time = time.time()
+        self.time = 0
+        self.turn_change_mark = time.time()
+        self.turn_time = 0
+        # Create players
+        self.setup_players()
 
     def stop(self):
         self.state = 'stopped'
@@ -67,24 +79,26 @@ class GameState:
         record = {'TurnNumber': self.turn_nm,
                   'Player': {'Name': self.current_player.name,
                              'Color': self.current_player.color.title(),
-                             'Time': self.current_player.time},  # ToDo: figure how to keep up with total player time
+                             'Time': seconds_to_hms(self.current_player.time, milliseconds=True)},
                   'Move': {'Piece': piece.type.title(),
                            'StartPosition': s_position,
                            'EndPosition': e_position,
                            'Special': special,
                            'Captured': capture,
-                           'Time': self.turn_time},
+                           'Time': seconds_to_hms(self.turn_time, milliseconds=True)},
                   'AI': {}}
         self.log.append(record)
         cute_print(f"{record}", 'write')
 
     def next_player(self):
-        self.turn_nm += 1
-        self.current_player = self.black_player if self.current_player.color == 'white' else self.white_player
+        self.current_player.cumulative_time += self.turn_time
         self.turn_change_mark = time.time()
+        self.current_player = self.black_player if self.current_player.color == 'white' else self.white_player
+        self.turn_nm += 1
 
     def update_elapsed_time(self):
         # Full time since game started (it updates on every main loop of game)
         self.time = time.time() - self.start_time
         self.turn_time = time.time() - self.turn_change_mark
+        self.current_player.time = self.current_player.cumulative_time + self.turn_time
 
