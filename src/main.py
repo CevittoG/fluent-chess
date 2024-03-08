@@ -3,7 +3,7 @@ from pygame.locals import FULLSCREEN, RESIZABLE
 from src import GameState, Board
 from src.visualization import draw_board, draw_pieces, highlight_square, render_players_info, render_square_info, render_clock
 from src.visualization import BOARD_PX_SIZE, SQUARE_PX_SIZE, POSSIBLE_MOVES_COLOR, POSSIBLE_CAPTURES_COLOR, FONT_TYPE, FONT_PX_SIZE_M, MARGIN_PX_SIZE, BACKGROUND_COLOR
-from src.utils import cute_print
+from src.utils import Emoji, cute_print
 
 
 def main():
@@ -18,7 +18,7 @@ def main():
 
     # Set screen size and caption
     screen = pygame.display.set_mode((BOARD_PX_SIZE*2, BOARD_PX_SIZE + SQUARE_PX_SIZE), RESIZABLE)
-    pygame.display.set_caption("Chess Sage")
+    pygame.display.set_caption(f"Fluent Chess {Emoji('snake')}")
     game_font = pygame.font.Font(FONT_TYPE, FONT_PX_SIZE_M)
 
     # Create a game classes

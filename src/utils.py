@@ -76,7 +76,8 @@ class Emoji:
         'white_knight': '\u2658',
         'white_bishop': '\u2657',
         'white_king': '\u2654',
-        'white_queen': '\u2655'
+        'white_queen': '\u2655',
+        'snake': '\U0001F40D'           # 🐍 Snake
     }
 
     def __init__(self, emoji='empty'):
