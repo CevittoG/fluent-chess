@@ -174,7 +174,7 @@ def highlight_square(screen, valid_moves: list[tuple], color: tuple[int, int, in
         pygame.draw.rect(screen, color, square_rect, width=8)
 
 
-def render_players_info(screen, font: pygame.font.Font, game: GameState):
+def render_players_info(screen, font: pygame.font.Font, game: GameState):  # ToDo: create formula for text and icon distance based on SQUARE_PX_SIZE
     def get_data_from_log(log_data: list[dict], player_color: str, icon_size: tuple) -> tuple[pygame.Surface, str, list[pygame.Surface]]:
         p_data = [data for data in log_data if data['Player']['Color'] == player_color]
 

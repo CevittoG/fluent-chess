@@ -30,6 +30,7 @@ def main():
     # Main game loop
     valid_moves = []
     while game.state == 'running':
+        game.update_elapsed_time()
         # Handle user input (e.g., mouse clicks for move selection)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:

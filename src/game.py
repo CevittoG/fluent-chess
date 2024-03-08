@@ -9,6 +9,7 @@ class Player:
     def __init__(self, color: str, name: Union[str, None]):
         self.name = name
         self.color = color
+        self.time = 0
 
     def __str__(self):
         if self.name is None or self.name == '':
@@ -19,16 +20,23 @@ class Player:
 
 class GameState:
     def __init__(self, chessboard: Board, white_player_name: Union[str, None], black_player_name: Union[str, None]):
+        # Game state
         self.state = 'running'
+        # Timer
+        self.start_time = time.time()
+        self.time = 0
+        self.turn_change_mark = time.time()
+        self.turn_time = 0
+        # Logging
+        self.log = []
+        self.turn_nm = 1
+        # Board state
         self.chessboard = chessboard
+        # Players state
         self.black_player = None
         self.white_player = None
         self.current_player = None
         self.setup_players(white_player_name, black_player_name)
-
-        self.game_timer = time.time()
-        self.log = []
-        self.turn_nm = 1
 
     def setup_players(self, white_player_name: Union[str, None], black_player_name: Union[str, None]):
         # Create players
@@ -38,7 +46,7 @@ class GameState:
         self.current_player = self.white_player
 
     def stop(self):
-        self.state = 'stoped'
+        self.state = 'stopped'
 
     def turn(self, start_position: Tuple[int, int], end_position: Tuple[int, int], piece_valid_moves: list[tuple[tuple[int, int], str]]):
         piece = self.chessboard.get_piece_at(start_position)
@@ -57,13 +65,15 @@ class GameState:
 
     def record_turn(self, piece: Piece, s_position: tuple, e_position: tuple, special: Union[bool, dict] = False, capture: Union[bool, str] = False):
         record = {'TurnNumber': self.turn_nm,
-                  'PlayerName': self.current_player.name,
-                  'PlayerColor': self.current_player.color.title(),
+                  'Player': {'Name': self.current_player.name,
+                             'Color': self.current_player.color.title(),
+                             'Time': self.current_player.time},  # ToDo: figure how to keep up with total player time
                   'Move': {'Piece': piece.type.title(),
                            'StartPosition': s_position,
                            'EndPosition': e_position,
                            'Special': special,
-                           'Captured': capture},
+                           'Captured': capture,
+                           'Time': self.turn_time},
                   'AI': {}}
         self.log.append(record)
         cute_print(f"{record}", 'write')
@@ -71,3 +81,10 @@ class GameState:
     def next_player(self):
         self.turn_nm += 1
         self.current_player = self.black_player if self.current_player.color == 'white' else self.white_player
+        self.turn_change_mark = time.time()
+
+    def update_elapsed_time(self):
+        # Full time since game started (it updates on every main loop of game)
+        self.time = time.time() - self.start_time
+        self.turn_time = time.time() - self.turn_change_mark
+
