@@ -237,12 +237,12 @@ def render_square_info(screen: pygame.Surface, board):
         square = position_to_chess_notation((row, col))
 
         mouse_text = f'{square}{piece_type}'
-        rect_diff = len(mouse_text) + 1 if len(mouse_text) == 2 else len(mouse_text) - 2  # ToDo: name could be better
+        rect_multiplier = len(mouse_text) + 1 if len(mouse_text) == 2 else len(mouse_text) - 2
 
         font = pygame.font.Font(FONT_TYPE, FONT_PX_SIZE_M)
 
         # Rectangle
-        square_rect = pygame.Rect(mouse_x, mouse_y, FONT_PX_SIZE_M * rect_diff, FONT_PX_SIZE_M * 1.5)
+        square_rect = pygame.Rect(mouse_x, mouse_y, FONT_PX_SIZE_M * rect_multiplier, FONT_PX_SIZE_M * 1.5)
         pygame.draw.rect(screen, BACKGROUND_COLOR, square_rect, border_radius=8)
 
         # Text
