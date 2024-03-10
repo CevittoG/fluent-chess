@@ -2,23 +2,7 @@ from src import Board, GameState
 from src.utils import position_to_chess_notation, move_to_chess_notation, seconds_to_hms
 from src.config import update_game_dimensions, ICONS, ICON_PX_SIZE, FONT_TYPE, FONT_COLOR, PIECES_IMAGES, PIECE_PX_SIZE, BACKGROUND_COLOR, BOARD_LIGHT_COLOR, BOARD_DARK_COLOR, HIGHLIGHT_COLOR
 import pygame
-import pathlib
-from src.utils import cute_print, position_to_chess_notation, move_to_chess_notation, seconds_to_hms
-from typing import Generator, Any
-
-# Board Measurements
-BOARD_PX_SIZE = 800
-SQUARE_PX_SIZE = BOARD_PX_SIZE // 8
-MARGIN_PX_SIZE = SQUARE_PX_SIZE // 2
-
-MEDIA_DIRECTORY = pathlib.Path(__file__).absolute().parent.parent / 'media'
-
-# Image settings
-IMG_DIRECTORY = MEDIA_DIRECTORY / 'images'
-PIECES_NAMES = ('king', 'queen', 'bishop', 'knight', 'rook', 'pawn')
-PIECES_COLORS = ('white', 'black')
-PIECES_IMAGES = {f"{color}_{name}": pygame.image.load(str(IMG_DIRECTORY / f"{color}_{name}.png")) for color in PIECES_COLORS for name in PIECES_NAMES}
-PIECE_PX_SIZE = list(PIECES_IMAGES.values())[0].get_size()
+import math
 
 # Font settings
 FONT_DIRECTORY = MEDIA_DIRECTORY / 'fonts'
