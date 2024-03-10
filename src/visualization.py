@@ -1,4 +1,6 @@
-from src import Board, Piece, GameState
+from src import Board, GameState
+from src.utils import position_to_chess_notation, move_to_chess_notation, seconds_to_hms
+from src.config import update_game_dimensions, ICONS, ICON_PX_SIZE, FONT_TYPE, FONT_COLOR, PIECES_IMAGES, PIECE_PX_SIZE, BACKGROUND_COLOR, BOARD_LIGHT_COLOR, BOARD_DARK_COLOR, HIGHLIGHT_COLOR
 import pygame
 import pathlib
 from src.utils import cute_print, position_to_chess_notation, move_to_chess_notation, seconds_to_hms
@@ -46,13 +48,8 @@ def calculate_piece_size():
     """
     Calculates the appropriate size for a piece image, maintaining aspect ratio.
 
-    Args:
-        square_size (int): The size of each square on the chessboard.
-        piece_image (pygame.Surface): The original image of the chess piece.
-
-    Returns:
-        tuple: (scaled_width, scaled_height) of the piece image with maintained aspect ratio.
-    """
+def calculate_piece_size(screen: pygame.Surface):
+    _, SQUARE_PX_SIZE, _, _, _, _ = update_game_dimensions(screen.get_width())
 
     original_width, original_height = PIECE_PX_SIZE
 
@@ -67,7 +64,9 @@ def calculate_piece_size():
     return scaled_width, scaled_height
 
 
-def calculate_icon_size():
+def calculate_icon_size(screen: pygame.Surface):
+    _, _, MARGIN_PX_SIZE, _, _, _ = update_game_dimensions(screen.get_width())
+
     original_width, original_height = ICON_PX_SIZE
 
     # Calculate the maximum allowed size based on the margin dimensions
@@ -82,12 +81,8 @@ def calculate_icon_size():
 
 
 def draw_board(screen: pygame.Surface):
-    """
-    Iterates through each square on the board and draws a colored rectangle using pygame.draw.rect, alternating colors for a checkerboard pattern.
-    :param screen:
-    :param font:
-    :return:
-    """
+    _, SQUARE_PX_SIZE, MARGIN_PX_SIZE, _, _, FONT_PX_SIZE_S = update_game_dimensions(screen.get_width())
+
     font = pygame.font.Font(FONT_TYPE, FONT_PX_SIZE_S)  # SQUARE_PX_SIZE // 10)
     # Iterate over each square
     for row in range(8):
@@ -115,16 +110,9 @@ def draw_board(screen: pygame.Surface):
 
 
 def draw_pieces(screen: pygame.Surface, board: Board, selected_piece_row: int, selected_piece_col: int):
-    """
-    Iterates through each square and checks if a piece is present. If so, it retrieves the piece image from a dictionary and uses pygame.blit to draw the image onto the corresponding square on the screen.
-    :param screen:
-    :param board:
-    :param piece_images:
-    :param selected_piece_row:
-    :param selected_piece_col:
-    :return:
-    """
-    piece_size = calculate_piece_size()
+    _, SQUARE_PX_SIZE, MARGIN_PX_SIZE, _, _, _ = update_game_dimensions(screen.get_width())
+
+    piece_size = calculate_piece_size(screen)
 
     # Iterate over each square on the board
     for row in range(8):
@@ -161,8 +149,7 @@ def draw_pieces(screen: pygame.Surface, board: Board, selected_piece_row: int, s
 
 
 def highlight_square(screen: pygame.Surface, valid_moves: list[tuple], color: tuple[int, int, int]):
-    """
-    Highlights squares representing valid moves for the given piece.
+    _, SQUARE_PX_SIZE, MARGIN_PX_SIZE, _, _, _ = update_game_dimensions(screen.get_width())
 
     Args:
         screen:
@@ -175,8 +162,10 @@ def highlight_square(screen: pygame.Surface, valid_moves: list[tuple], color: tu
         pygame.draw.rect(screen, color, square_rect, width=8)
 
 
-def render_players_info(screen: pygame.Surface, font: pygame.font.Font, game: GameState):  # ToDo: create formula for text and icon distance based on SQUARE_PX_SIZE
-    def get_data_from_log(log_data: list[dict], player_color: str, icon_size: tuple) -> tuple[pygame.Surface, str, list[pygame.Surface]]:
+def render_players_info(screen: pygame.Surface, game: GameState):
+    BOARD_PX_SIZE, SQUARE_PX_SIZE, MARGIN_PX_SIZE, _, FONT_PX_SIZE_M, _ = update_game_dimensions(screen.get_width())
+
+    def get_data_from_log(log_data: list[dict], player_color: str) -> tuple[pygame.Surface, str, list[pygame.Surface]]:
         p_data = [data for data in log_data if data['Player']['Color'] == player_color]
 
         if len(p_data) < 1:
@@ -227,6 +216,8 @@ def render_players_info(screen: pygame.Surface, font: pygame.font.Font, game: Ga
 
 
 def render_square_info(screen: pygame.Surface, board):
+    _, SQUARE_PX_SIZE, MARGIN_PX_SIZE, _, FONT_PX_SIZE_M, _ = update_game_dimensions(screen.get_width())
+
     mouse_x, mouse_y = pygame.mouse.get_pos()
     row = ((mouse_y - MARGIN_PX_SIZE) // SQUARE_PX_SIZE)
     col = ((mouse_x - MARGIN_PX_SIZE) // SQUARE_PX_SIZE)
@@ -251,6 +242,8 @@ def render_square_info(screen: pygame.Surface, board):
 
 
 def render_clock(screen: pygame.Surface, game: GameState):
+    BOARD_PX_SIZE, SQUARE_PX_SIZE, MARGIN_PX_SIZE, FONT_PX_SIZE_L, FONT_PX_SIZE_M, _ = update_game_dimensions(screen.get_width())
+
     x_position = MARGIN_PX_SIZE + BOARD_PX_SIZE + FONT_PX_SIZE_M
     # General Clock
     general_clock_font = pygame.font.Font(FONT_TYPE, FONT_PX_SIZE_L)
