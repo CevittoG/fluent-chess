@@ -141,7 +141,7 @@ def render_players_info(screen: pygame.Surface, game: GameState):
     for player in ('Black', 'White'):
         icon_size = calculate_icon_size()
         # Get player data
-        last_p_moved, last_position, captured_icon_list = get_data_from_log(game.log, player, icon_size)
+        icon_p_moved, chess_notation_move, captured_icon_list = get_data_from_log(game.log, player)
 
         # Prepare player text
         text_position_y = (MARGIN_PX_SIZE - FONT_PX_SIZE_M) // 2
@@ -154,10 +154,8 @@ def render_players_info(screen: pygame.Surface, game: GameState):
         icon_position_y += BOARD_PX_SIZE + MARGIN_PX_SIZE if player == 'White' else 0
         screen.blit(last_p_moved, (MARGIN_PX_SIZE + FONT_PX_SIZE_M * 2, icon_position_y))
         # Coordinates
-        position_text = font.render(f"{last_position}", True, FONT_COLOR)
-        screen.blit(position_text, (MARGIN_PX_SIZE + FONT_PX_SIZE_M * 3 + icon_size[0], text_position_y))
-
-        # ToDo: Clock... time played by player
+        move_text = font.render(f"{chess_notation_move}", True, FONT_COLOR)
+        screen.blit(move_text, (MARGIN_PX_SIZE + (SQUARE_PX_SIZE * 1.5) + icon_size[0]*2, text_position_y))
 
         # Prepare captured icons
         for i in range(len(captured_icon_list)):
