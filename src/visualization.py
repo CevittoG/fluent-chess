@@ -147,8 +147,10 @@ def render_players_info(screen: pygame.Surface, game: GameState):
         text_position_y = (MARGIN_PX_SIZE - FONT_PX_SIZE_M) // 2
         text_position_y += BOARD_PX_SIZE + MARGIN_PX_SIZE if player == 'White' else 0
         # Player initial letter
-        player_text = font.render(f"{player[0]}:", True, FONT_COLOR)
+        player_name = str(game.white_player) if player == 'White' else str(game.black_player)
+        player_text = font.render(f"{player_name}", True, FONT_COLOR)
         screen.blit(player_text, (MARGIN_PX_SIZE, text_position_y))
+
         # Piece moved icon
         icon_position_y = (MARGIN_PX_SIZE - FONT_PX_SIZE_M) // 3
         icon_position_y += BOARD_PX_SIZE + MARGIN_PX_SIZE if player == 'White' else 0
