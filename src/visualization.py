@@ -164,12 +164,15 @@ def render_players_info(screen: pygame.Surface, game: GameState):
         # ToDo: Clock... time played by player
 
         # Prepare captured icons
-        sword_icon = pygame.transform.scale(ICONS['sword'], icon_size)
-        sword_icon_position = (MARGIN_PX_SIZE + SQUARE_PX_SIZE * 3, icon_position_y)
-        screen.blit(sword_icon, sword_icon_position)
-        # Icons iteration
         for i in range(len(captured_icon_list)):
-            screen.blit(captured_icon_list[i], (sword_icon_position[0] + icon_size[0] * (i + 2), icon_position_y))
+            # icons position over and under general clock
+            icon_captured_position_y = MARGIN_PX_SIZE + SQUARE_PX_SIZE * 4
+            icon_captured_position_y += icon_size[0]*2 if player == 'White' else -(icon_size[0]*3)
+            icon_captured_position_y += (math.floor(i/2) * icon_size[0] * 1.5) if player == 'White' else -(math.floor(i/2) * icon_size[0] * 1.5)
+            # icons positions on two columns
+            icon_captured_position_x = MARGIN_PX_SIZE + BOARD_PX_SIZE + FONT_PX_SIZE_M
+            icon_captured_position_x += 0 if (i % 2) == 0 else icon_size[0] * 2
+            screen.blit(captured_icon_list[i], (icon_captured_position_x, icon_captured_position_y))
 
 
 def render_square_info(screen: pygame.Surface, board):
