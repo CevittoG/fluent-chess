@@ -79,6 +79,7 @@ def draw_pieces(screen: pygame.Surface, board: Board, selected_piece_row: int, s
             # Highlight the selected piece (if any)
             if row == selected_piece_row and col == selected_piece_col:
                 # Create a rectangle representing the square
+
                 highlight_square(screen, [(row, col)], HIGHLIGHT_COLOR)
 
             # If a piece is present, draw its image on the corresponding square
@@ -108,11 +109,6 @@ def draw_pieces(screen: pygame.Surface, board: Board, selected_piece_row: int, s
 def highlight_square(screen: pygame.Surface, valid_moves: list[tuple], color: tuple[int, int, int]):
     _, SQUARE_PX_SIZE, MARGIN_PX_SIZE, _, _, _ = update_game_dimensions(screen.get_width())
 
-    Args:
-        screen:
-        valid_moves:
-        color:
-    """
     for row, col in valid_moves:
         # Create a rectangle representing the square
         square_rect = pygame.Rect(col * SQUARE_PX_SIZE + MARGIN_PX_SIZE, row * SQUARE_PX_SIZE + MARGIN_PX_SIZE, SQUARE_PX_SIZE, SQUARE_PX_SIZE)
