@@ -4,33 +4,6 @@ from src.config import update_game_dimensions, ICONS, ICON_PX_SIZE, FONT_TYPE, F
 import pygame
 import math
 
-# Font settings
-FONT_DIRECTORY = MEDIA_DIRECTORY / 'fonts'
-FONT_TTF_FILENAME = 'consola'  # 'micross' 'DMSans-Regular' 'verdana' 'Ubuntu-Regular'
-FONT_TYPE = str(FONT_DIRECTORY / f'{FONT_TTF_FILENAME}.ttf')
-FONT_PX_SIZE_L = MARGIN_PX_SIZE // 2
-FONT_PX_SIZE_M = MARGIN_PX_SIZE // 3
-FONT_PX_SIZE_S = MARGIN_PX_SIZE // 4
-FONT_COLOR = (255, 255, 255)  # (242, 242, 242)
-
-# Icon Settings
-ICON_DIRECTORY = MEDIA_DIRECTORY / 'icons'
-ICON_NAMES = ('king', 'queen', 'bishop', 'knight', 'rook', 'pawn', 'castling', 'promotion', 'sword', 'chess-clock')
-ICONS = {f"{name}": pygame.image.load(str(ICON_DIRECTORY / f"{name}.png")) for name in ICON_NAMES}
-ICON_PX_SIZE = list(ICONS.values())[0].get_size()
-
-# Colors
-BACKGROUND_COLOR = (40, 40, 40)  # (58, 58, 58)
-BOARD_LIGHT_COLOR = (247, 243, 235)
-BOARD_DARK_COLOR = (158, 122, 91)
-HIGHLIGHT_COLOR = (255, 215, 0)
-POSSIBLE_MOVES_COLOR = (102, 187, 106)  # (153, 204, 0) or (139, 172, 139)
-POSSIBLE_CAPTURES_COLOR = (204, 0, 0)
-
-
-def calculate_piece_size():
-    """
-    Calculates the appropriate size for a piece image, maintaining aspect ratio.
 
 def calculate_piece_size(screen: pygame.Surface):
     _, SQUARE_PX_SIZE, _, _, _, _ = update_game_dimensions(screen.get_width())
