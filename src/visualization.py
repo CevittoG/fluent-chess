@@ -112,7 +112,7 @@ def highlight_square(screen: pygame.Surface, valid_moves: list[tuple], color: tu
     for row, col in valid_moves:
         # Create a rectangle representing the square
         square_rect = pygame.Rect(col * SQUARE_PX_SIZE + MARGIN_PX_SIZE, row * SQUARE_PX_SIZE + MARGIN_PX_SIZE, SQUARE_PX_SIZE, SQUARE_PX_SIZE)
-        pygame.draw.rect(screen, color, square_rect, width=8)
+        pygame.draw.rect(screen, color, square_rect, width=SQUARE_PX_SIZE//10)
 
 
 def render_players_info(screen: pygame.Surface, game: GameState):
@@ -144,7 +144,7 @@ def render_players_info(screen: pygame.Surface, game: GameState):
         icon_p_moved, chess_notation_move, captured_icon_list = get_data_from_log(game.log, player)
 
         # Prepare player text
-        text_position_y = (MARGIN_PX_SIZE - FONT_PX_SIZE_M) // 2
+        text_position_y = FONT_PX_SIZE_M
         text_position_y += BOARD_PX_SIZE + MARGIN_PX_SIZE if player == 'White' else 0
         # Player initial letter
         player_name = str(game.white_player) if player == 'White' else str(game.black_player)
@@ -152,9 +152,9 @@ def render_players_info(screen: pygame.Surface, game: GameState):
         screen.blit(player_text, (MARGIN_PX_SIZE, text_position_y))
 
         # Piece moved icon
-        icon_position_y = (MARGIN_PX_SIZE - FONT_PX_SIZE_M) // 3
-        icon_position_y += BOARD_PX_SIZE + MARGIN_PX_SIZE if player == 'White' else 0
-        screen.blit(last_p_moved, (MARGIN_PX_SIZE + FONT_PX_SIZE_M * 2, icon_position_y))
+        icon_moved_position_y = icon_size[0] // 2
+        icon_moved_position_y += BOARD_PX_SIZE + MARGIN_PX_SIZE if player == 'White' else 0
+        screen.blit(icon_p_moved, (MARGIN_PX_SIZE + (SQUARE_PX_SIZE * 1.5), icon_moved_position_y))
         # Coordinates
         move_text = font.render(f"{chess_notation_move}", True, FONT_COLOR)
         screen.blit(move_text, (MARGIN_PX_SIZE + (SQUARE_PX_SIZE * 1.5) + icon_size[0]*2, text_position_y))
@@ -204,7 +204,7 @@ def render_clock(screen: pygame.Surface, game: GameState):
     # General Clock
     general_clock_font = pygame.font.Font(FONT_TYPE, FONT_PX_SIZE_L)
     general_clock_time = general_clock_font.render(f"{seconds_to_hms(game.time)}", True, FONT_COLOR)
-    screen.blit(general_clock_time, (x_position, MARGIN_PX_SIZE + (SQUARE_PX_SIZE * 4) - FONT_PX_SIZE_M))
+    screen.blit(general_clock_time, (x_position, MARGIN_PX_SIZE + (SQUARE_PX_SIZE * 4) - FONT_PX_SIZE_L // 2))
 
     # Players Clock
     player_clock_font = pygame.font.Font(FONT_TYPE, FONT_PX_SIZE_M)
