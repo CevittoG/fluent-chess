@@ -25,13 +25,13 @@ def main():
 
     # Create a game classes
     chessboard = Board()
-    game = GameState(chessboard, None, None)  # ToDo: Create input for players names
+    game = GameState(chessboard)  # ToDo: Create input for players names
 
     # (Optional) Initialize other game elements (e.g., AI, player information)
 
     # Main game loop
     valid_moves = []
-    game.start()
+    game.start('CevittoG', None)
     while game.state == 'running':
         game.update_elapsed_time()
         # Handle user input (e.g., mouse clicks for move selection)
@@ -75,6 +75,7 @@ def main():
                     # Check posible moves for specific piece
                     valid_moves = SEL_PIECE.get_valid_moves(chessboard) if SEL_PIECE is not None else []
 
+            # Click release event
             elif event.type == pygame.MOUSEBUTTONUP:
                 mouse_is_down = False
                 # Check if a piece is released on a valid square
@@ -109,7 +110,7 @@ def main():
         # Square information flowing mouse position
         render_square_info(screen, chessboard)
         # Players info
-        render_players_info(screen, game_font, game)
+        render_players_info(screen, game)
         # Time
         render_clock(screen, game)
 
