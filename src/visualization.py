@@ -138,6 +138,9 @@ def render_players_info(screen: pygame.Surface, game: GameState):
 
         return scaled_piece_icon, last_move_position, captured_pieces
 
+    icon_size = calculate_icon_size(screen)
+    font = pygame.font.Font(FONT_TYPE, FONT_PX_SIZE_M)
+
     for player in ('Black', 'White'):
         icon_size = calculate_icon_size()
         # Get player data
