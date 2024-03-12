@@ -1,11 +1,11 @@
-from typing import Union, List, Tuple
-from src.utils import cute_print, adjacent_positions
+from typing import Union, Tuple
+from src.utils import adjacent_positions
 
 
 class Piece:
-    def __init__(self, color: str, type: str, current_square: Tuple[int, int]):
-        self.color: str = color
-        self.type: str = type
+    def __init__(self, p_color: str, p_type: str, current_square: Tuple[int, int]):
+        self.color: str = p_color
+        self.type: str = p_type
         self.current_square: Tuple[int, int] = current_square
         self.movements: list[Tuple[int, int]] = [current_square]
         self.captured: list[Union[Piece, None]] = []
@@ -262,7 +262,7 @@ class Pawn(Piece):
         if row == (6 if self.color == "white" else 1) and board.get_piece_at((row + move_direction, col)) is None and board.get_piece_at((row + 2 * move_direction, col)) is None:
             valid_moves.append(((row + 2 * move_direction, col), 'empty-standard'))
 
-        # Additional logic for "en passant" (in passing) ToDo: Complete validation
+        # Additional logic for "en passant" (in passing) ToDo: Complete validation (pawn must had move last turn)
         passing_piece = board.get_piece_at((row, col + 1))
         if passing_piece is not None and passing_piece.color != self.color and len(passing_piece.movements) == 2:
             valid_moves.append(((row + move_direction, col + 1), 'empty-right_passant'))
