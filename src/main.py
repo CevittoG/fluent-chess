@@ -2,7 +2,7 @@ import pygame
 from pygame.locals import FULLSCREEN, RESIZABLE
 from src import GameState, Board
 from src.visualization import draw_board, draw_pieces, highlight_square, render_players_info, render_square_info, render_clock
-from src.visualization import BOARD_PX_SIZE, SQUARE_PX_SIZE, POSSIBLE_MOVES_COLOR, POSSIBLE_CAPTURES_COLOR, FONT_TYPE, FONT_PX_SIZE_M, MARGIN_PX_SIZE, BACKGROUND_COLOR
+from src.config import update_game_dimensions, ASPECT_RATIO, BACKGROUND_COLOR, POSSIBLE_MOVES_COLOR, POSSIBLE_CAPTURES_COLOR
 from src.utils import Emoji, cute_print
 
 
@@ -17,7 +17,9 @@ def main():
     pygame.init()
 
     # Set screen size and caption
-    screen = pygame.display.set_mode((BOARD_PX_SIZE*2, BOARD_PX_SIZE + SQUARE_PX_SIZE), RESIZABLE)
+    screen = pygame.display.set_mode((1200, 675), RESIZABLE)
+    SCREEN_PX_W, SCREEN_PX_H = screen.get_width(), screen.get_height()
+    BOARD_PX_SIZE, SQUARE_PX_SIZE, MARGIN_PX_SIZE, FONT_PX_SIZE_L, FONT_PX_SIZE_M, FONT_PX_SIZE_S = update_game_dimensions(SCREEN_PX_W)
     pygame.display.set_caption(f"Fluent Chess {Emoji('snake')}")
     game_font = pygame.font.Font(FONT_TYPE, FONT_PX_SIZE_M)
 
@@ -36,6 +38,28 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 game.stop()
+
+            # Resize event
+            elif event.type == pygame.VIDEORESIZE:
+                # Update screen size based on event
+                screen_width, screen_height = event.w, event.h
+
+                # Calculate new dimensions based on aspect ratio
+                if screen_width / screen_height > ASPECT_RATIO:
+                    new_width = int(screen_height * ASPECT_RATIO)
+                    screen = pygame.display.set_mode((new_width, screen_height), RESIZABLE)
+                    print(new_width, screen_height)
+                else:
+                    new_height = int(screen_width / ASPECT_RATIO)
+                    screen = pygame.display.set_mode((screen_width, new_height), RESIZABLE)
+                    print(screen_width, new_height)
+
+                # Recalculate board and element sizes based on new screen size
+                # update_game_dimensions(screen_width, screen_height)
+                # Clear the screen before redrawing
+                screen.fill(BACKGROUND_COLOR)
+
+            # Click event
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_is_down = True
                 # Check if a piece is clicked within the board area
