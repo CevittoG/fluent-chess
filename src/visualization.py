@@ -142,7 +142,6 @@ def render_players_info(screen: pygame.Surface, game: GameState):
     font = pygame.font.Font(FONT_TYPE, FONT_PX_SIZE_M)
 
     for player in ('Black', 'White'):
-        icon_size = calculate_icon_size()
         # Get player data
         icon_p_moved, chess_notation_move, captured_icon_list = get_data_from_log(game.log, player)
 
