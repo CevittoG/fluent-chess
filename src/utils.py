@@ -190,13 +190,7 @@ def move_to_chess_notation(piece, start_position: tuple[int, int], end_position:
       start_position: A tuple representing the starting square (row, col).
       end_position: A tuple representing the ending square (row, col).
       capture: Boolean indicating if the move captures a piece (True) or not (False).
-      special_move: code from game logging
-            - queenside_castling
-            - kingside_castling
-            - queen_promotion
-            - bishop_promotion
-            - knight_promotion
-            - rook_promotion
+      special_move: code from game logging (e.g., queenside_castling, kingside_castling, queen_promotion, bishop_promotion, knight_promotion, rook_promotion)
 
     Returns:
       The algebraic notation string representing the move.
@@ -262,7 +256,7 @@ def position_to_chess_notation(position: tuple[int, int]) -> str:
     return f"{file}{rank}"
 
 
-def seconds_to_hms(seconds, milliseconds: bool = False):
+def seconds_to_hms(seconds: float, milliseconds: bool = False) -> str:
     """Converts a floating-point number of seconds into a string formatted as HH:MM:SS.
         Args:
         seconds: The number of seconds to convert (float).
