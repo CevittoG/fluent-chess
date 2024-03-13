@@ -2,7 +2,7 @@ import time
 from src.utils import cute_print, seconds_to_hms
 from src.board import Board
 from src.pieces import Piece
-from typing import Union, Tuple, List, Any
+from typing import Union, Tuple
 
 
 class Player:
@@ -20,7 +20,7 @@ class Player:
 
 
 class GameState:
-    def __init__(self, chessboard: Board, white_player_name: Union[str, None], black_player_name: Union[str, None]):
+    def __init__(self, chessboard: Board):
         # Timer
         self.start_time = None
         self.time = None
@@ -35,19 +35,17 @@ class GameState:
         self.chessboard = chessboard
         # Players state
         self.black_player = None
-        self.black_player_name = black_player_name
         self.white_player = None
-        self.white_player_name = white_player_name
         self.current_player = None
 
-    def setup_players(self):
+    def setup_players(self, white_player_name: Union[str, None], black_player_name: Union[str, None]):
         # Create players
-        self.white_player = Player('white', self.white_player_name)
-        self.black_player = Player('black', self.black_player_name)
+        self.white_player = Player('white', white_player_name)
+        self.black_player = Player('black', black_player_name)
         # Set white player as first player
         self.current_player = self.white_player
 
-    def start(self):
+    def start(self, white_player_name: Union[str, None], black_player_name: Union[str, None]):
         self.state = 'running'
         # Timer
         self.start_time = time.time()
@@ -101,4 +99,3 @@ class GameState:
         self.time = time.time() - self.start_time
         self.turn_time = time.time() - self.turn_change_mark
         self.current_player.time = self.current_player.cumulative_time + self.turn_time
-
