@@ -46,7 +46,7 @@ class Board:
                 if filter_func(piece, filter_value):
                     yield piece
 
-    def move_piece(self, start_position: Tuple[int, int], end_position: Tuple[int, int], piece_valid_moves: list[tuple[tuple[int, int], str]]) -> Tuple[Piece, tuple, tuple, Union[bool, str], Union[bool, str]]:
+    def move_piece(self, start_position: Tuple[int, int], end_position: Tuple[int, int], piece_valid_moves: list[tuple[tuple[int, int], str]]) -> Union[bool, Tuple[Piece, tuple, tuple, Union[bool, str], Union[bool, str]]]:
         piece = self.get_piece_at(start_position)
         # Check if there's a piece at start_position
         if piece is None:
