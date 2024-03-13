@@ -1,5 +1,5 @@
 import pygame
-from pygame.locals import FULLSCREEN, RESIZABLE
+from pygame.locals import RESIZABLE  # FULLSCREEN, SCALED
 from src import GameState, Board
 from src.visualization import draw_board, draw_pieces, highlight_square, render_players_info, render_square_info, render_clock
 from src.config import update_game_dimensions, ASPECT_RATIO, BACKGROUND_COLOR, POSSIBLE_MOVES_COLOR, POSSIBLE_CAPTURES_COLOR
@@ -10,7 +10,6 @@ def main():
     SEL_PIECE = None  # Stores the currently selected piece (None if no piece is selected)
     SEL_PIECE_ROW = None  # Row index of the selected piece (None if no piece is selected)
     SEL_PIECE_COL = None  # Column index of the selected piece (None if no piece is selected)
-    mouse_is_down = False  # Flag to track mouse button state (pressed or released)
 
     # Initialize Pygame
     cute_print('Game started', 'rocket')
@@ -21,7 +20,6 @@ def main():
     SCREEN_PX_W, SCREEN_PX_H = screen.get_width(), screen.get_height()
     BOARD_PX_SIZE, SQUARE_PX_SIZE, MARGIN_PX_SIZE, FONT_PX_SIZE_L, FONT_PX_SIZE_M, FONT_PX_SIZE_S = update_game_dimensions(SCREEN_PX_W)
     pygame.display.set_caption(f"Fluent Chess {Emoji('snake')}")
-    game_font = pygame.font.Font(FONT_TYPE, FONT_PX_SIZE_M)
 
     # Create a game classes
     chessboard = Board()
@@ -61,7 +59,6 @@ def main():
 
             # Click event
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                mouse_is_down = True
                 # Check if a piece is clicked within the board area
                 mouse_x, mouse_y = pygame.mouse.get_pos()
                 row = (mouse_y - MARGIN_PX_SIZE) // SQUARE_PX_SIZE
@@ -77,7 +74,6 @@ def main():
 
             # Click release event
             elif event.type == pygame.MOUSEBUTTONUP:
-                mouse_is_down = False
                 # Check if a piece is released on a valid square
                 if SEL_PIECE is not None:
                     mouse_x, mouse_y = pygame.mouse.get_pos()
