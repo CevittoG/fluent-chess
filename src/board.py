@@ -38,7 +38,7 @@ class Board:
             return None
 
     def get_all_pieces(self, filter_by: Union[None, Tuple] = None):
-        filter_func, filter_value = filter_by or (lambda piece, _: piece is not None, None)  # Default to all pieces
+        filter_func, filter_value = filter_by or (lambda p, _: p is not None, None)  # Default to all pieces
 
         for row in range(8):
             for col in range(8):
