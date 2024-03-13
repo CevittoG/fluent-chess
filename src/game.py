@@ -53,7 +53,13 @@ class GameState:
         self.turn_change_mark = time.time()
         self.turn_time = 0
         # Create players
-        self.setup_players()
+        self.setup_players(white_player_name, black_player_name)
+
+    def pause(self):
+        self.state = 'paused'
+
+    def resume(self):
+        self.state = 'running'
 
     def stop(self):
         self.state = 'stopped'
